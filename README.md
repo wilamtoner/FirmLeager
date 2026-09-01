@@ -1,11 +1,11 @@
-# FirmLedger: Expense & Debt Manager
+# FirmLedger: Small Business Accounting, Expense & Debt Manager
 
 <p align="center">
-  <img src="assets/images/app_logo.jpg" alt="FirmLedger Logo" width="120" style="border-radius: 20px;"/>
+  <img src="assets/images/app_logo.jpg" alt="FirmLedger Logo" width="130" style="border-radius: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);"/>
 </p>
 
 <p align="center">
-  <b>A modern, cross-platform Firm Accounting, Expense Ledger, and Debt Payoff Management application built with Flutter, Riverpod, SQLite, and FL Chart.</b>
+  <b>The Ultimate Open-Source Small Business Accounting, Firm Ledger, Cash Flow Tracker & Debt Payoff Management App built with Flutter, Riverpod, SQLite, and FL Chart.</b>
 </p>
 
 <p align="center">
@@ -17,86 +17,165 @@
 
 ---
 
+## 📌 Executive Summary
+
+**FirmLedger** is a high-performance, cross-platform financial accounting and general ledger application designed for small business owners, freelancers, traders, and personal finance management. It combines real-time cash flow analytics, double-entry-style credit transaction logging, customer/supplier balances, and a mathematical **Debt Payoff Strategy Engine (Snowball vs. Avalanche)**.
+
+Whether managing daily sales, tracking customer credit accounts (Receivables), logging vendor payables, or exporting CSV financial statements, **FirmLedger** delivers a seamless offline-first experience with zero subscription fees.
+
+---
+
+## 🔍 Key SEO & Search Topics
+
+`flutter-app` • `accounting-software` • `ledger-book` • `expense-tracker` • `debt-manager` • `cash-flow` • `khatabook-clone` • `vyapar-alternative` • `riverpod` • `sqlite-database` • `snowball-avalanche` • `financial-dashboard`
+
+---
+
+## 📋 Table of Contents
+
+- [📌 Executive Summary](#-executive-summary)
+- [🌟 Key Features](#-key-features)
+- [📊 Financial Dashboard & 2x2 Grid](#-1-financial-dashboard--2x2-grid)
+- [📝 Income & Expense Entry Form](#-2-income--expense-entry-form)
+- [🧮 Debt Payoff Engine](#-3-debt-payoff-engine-snowball-vs-avalanche)
+- [📥 CSV Exporter & Analytics](#-4-csv-exporter--analytics)
+- [📁 Project Architecture](#-project-architecture)
+- [⚡ Getting Started](#-getting-started)
+- [❓ Frequently Asked Questions (FAQ)](#-frequently-asked-questions-faq)
+- [📄 License & Author](#-license--author)
+
+---
+
 ## 🌟 Key Features
 
-### 📊 1. Firm Financial Dashboard & 2x2 Ledger Grid
-- **Firm Header Banner**: Custom Firm Name, PAN/Tax Registration ID, Address, and Currency Symbol (`Rs.`, `$`, `€`, `£`).
-- **2x2 Financial Summary Grid**:
-  - 🟢 **Income (Revenue)**: Tracks total revenue with detailed drilldown.
-  - 🔴 **Expense (Outflows)**: Tracks operating expenditures and purchases.
+### 📊 1. Financial Dashboard & 2x2 Grid
+- **Firm Profile Banner**: Displays business name, PAN/VAT/GST tax registration ID, address, and currency symbol (`Rs.`, `$`, `€`, `£`).
+- **2x2 General Ledger Grid**:
+  - 🟢 **Income (Revenue)**: Tracks total revenue with breakdown drilldown modals.
+  - 🔴 **Expense (Outflows)**: Monitors operational expenditures, stock purchases, and utilities.
   - 🟦 **Receivables (Money to Collect)**: Tracks customer credit sales and debtor balances.
-  - 🔴 **Payables (Money Due)**: Tracks supplier credit purchases and lender debts.
-- **Date Range Picker**: Interactive date range selector (`YYYY-MM-DD` to `YYYY-MM-DD`) filtering all ledger metrics and analytics.
+  - 🔴 **Payables (Money Due)**: Manages supplier credit purchases and vendor liabilities.
+- **Dynamic Date Range Filter**: Interactive date range selector (`YYYY-MM-DD` to `YYYY-MM-DD`) filtering all dashboard analytics.
 
-### 📝 2. Modern Entry Form & Auto-Credit Sync
-- **Income $\leftrightarrow$ Expense Switcher**: Dynamic form toggling between Income and Expense modes.
-- **Categorized Inputs**: Goods/Product Sales, Service Revenue, Inventory Purchases, Utilities, and Operating Expenses.
-- **Automatic Credit Sync**: Selecting `Payment Method: Credit / On Account` automatically generates a **Receivable** or **Payable** debt entry in the ledger.
+### 📝 2. Income & Expense Entry Form
+- **Income $\leftrightarrow$ Expense Segment Switcher**: Fast single-screen form toggling.
+- **Categorized Inputs**: Goods/Product Sales, Service Revenue, Stock Purchases, Utilities, and Operating Expenses.
+- **Automatic Credit Sync**: Selecting `Payment Method: Credit / On Account` automatically generates a **Receivable (Owed to Me)** or **Payable (Owed by Me)** debt entry in the ledger.
 
-### 🧮 3. Debt Payoff Strategy Simulator
-- **Snowball Method ❄️**: Prioritizes lowest balance first to build momentum.
+### 🧮 3. Debt Payoff Engine (Snowball vs. Avalanche)
+- **Snowball Method ❄️**: Prioritizes lowest balance first to build psychological momentum.
 - **Avalanche Method 🏔️**: Prioritizes highest interest rate (APR %) first to minimize total interest paid.
-- **Extra Payment Slider**: Simulates extra monthly allocations ($0–$1,000/mo) with real-time payoff time reductions.
+- **Extra Budget Slider**: Interactive slider ($0–$1,000/mo) calculating real-time payoff time reductions.
 
-### 📥 4. Statement CSV Exporter & Analytics
-- **CSV Exporter**: Generates formatted CSV financial statements (`firm_statement.csv`) for accounting software import (Tally, QuickBooks, Excel).
-- **Interactive Charts**: Income vs. Expense Pie Chart and Receivables vs. Payables Bar Chart via `FL Chart`.
-- **Adaptive Dark & Light Theme**: Seamless switching between **Modern Light** (`#F8FAFC`) and **Financial Dark Mode** (`#0F172A`).
+### 📥 4. CSV Exporter & Analytics
+- **CSV Statement Exporter**: Generates formatted CSV files (`firm_statement.csv`) ready for Tally, QuickBooks, or Microsoft Excel import.
+- **FL Chart Visualizations**: Color-coded Income vs. Expense Pie Chart and Receivables vs. Payables Bar Chart.
+- **Adaptive Dark & Light Theme**: Switch between **Modern Light** (`#F8FAFC`) and **Financial Dark Mode** (`#0F172A`).
 
 ---
 
-## 📁 Architecture & Tech Stack
+## 📁 Project Architecture
 
 ```
-expense_debt_manager/
-├── assets/images/app_logo.jpg       # App Branding & Icons
-├── android/                         # Android Platform & Mipmap Launcher Icons
-├── linux/                           # Linux Native C++ Wrapper
+firm_ledger/
+├── assets/images/app_logo.jpg       # 3D Emerald & Gold App Logo Asset
+├── android/                         # Android App Wrapper & Mipmap Launcher Icons
+├── linux/                           # Linux Native C++ GTK Wrapper
 ├── lib/
-│   ├── main.dart                   # Root ProviderScope & Theme Configurations
-│   ├── models/                      # Transaction, Category, Debt, FirmProfile Models
-│   ├── providers/                   # Riverpod State Notifiers (Transaction, Debt, Category, Firm, Theme)
-│   ├── services/                    # SQLite Database Service (sqflite & sqflite_common_ffi v2)
-│   ├── utils/                       # Debt Calculator, CSV Exporter, Formatters
-│   └── views/                       # DashboardTab, ExpenseTab, DebtTab, NewTransactionScreen, Modals
+│   ├── main.dart                   # Root ProviderScope, App Title & Material 3 Themes
+│   ├── models/
+│   │   ├── transaction.dart        # Income & Expense Data Model
+│   │   ├── category.dart           # Expense Category & Monthly Budget Model
+│   │   ├── debt.dart               # Owed & Lent Debt Model
+│   │   ├── debt_payment.dart       # Payment Log Model
+│   │   └── firm_profile.dart       # Firm Name, Tax ID & Currency Preference Model
+│   ├── providers/
+│   │   ├── transaction_provider.dart # Riverpod State Notifier for Transactions
+│   │   ├── debt_provider.dart        # Riverpod State Notifier for Debts
+│   │   ├── category_provider.dart    # Riverpod State Notifier for Budgets
+│   │   ├── firm_provider.dart        # Riverpod State Notifier for Firm Settings
+│   │   ├── theme_provider.dart       # Riverpod Theme Mode Switcher
+│   │   └── dashboard_provider.dart   # Computed Net Worth & Cash Flow Provider
+│   ├── services/
+│   │   └── database_service.dart     # SQLite Database Service (sqflite & sqflite_common_ffi v2)
+│   ├── utils/
+│   │   ├── debt_calculator.dart      # Snowball vs. Avalanche Payoff Engine
+│   │   ├── csv_exporter.dart         # Financial Statement CSV Report Exporter
+│   │   └── formatters.dart           # Currency & Date Formatters
+│   └── views/
+│       ├── home_screen.dart          # Navigation Bar Host & Top App Bar
+│       ├── dashboard_tab.dart        # 2x2 Summary Grid, Quick Actions & FL Charts
+│       ├── expense_tab.dart          # Transaction Search, Filter Chips & Swipe-Delete
+│       ├── debt_tab.dart             # Receivables vs Payables Lists & Payment Logger
+│       ├── debt_payoff_screen.dart   # Interactive Payoff Strategy Simulator
+│       ├── new_transaction_screen.dart # Income/Expense Form with Credit Auto-Sync
+│       ├── edit_firm_dialog.dart     # Modal Bottom Sheet for Firm Profile Settings
+│       └── card_detail_dialog.dart   # Filtered Drilldown Modal for Grid Cards
 ├── pubspec.yaml
-└── LICENSE                          # MIT License
+├── LICENSE                          # MIT License
+└── README.md
 ```
-
-- **Framework**: Flutter (Material 3)
-- **State Management**: `flutter_riverpod` (v2.x)
-- **Database**: `sqflite` & `sqflite_common_ffi`
-- **Charts**: `fl_chart`
-- **Formatting**: `intl`
 
 ---
 
-## 🚀 How to Build & Run
+## ⚡ Getting Started
 
-### Prerequisites
-- Flutter SDK 3.x+
-- Android SDK / Linux GTK build tools (`clang`, `cmake`, `ninja-build`)
+### 1. Clone the Repository
+```bash
+git clone https://github.com/wilamtoner/FirmLeager.git
+cd FirmLeager
+```
 
-### Run on Connected Android Device
+### 2. Install Dependencies
+```bash
+flutter pub get
+```
+
+### 3. Run Natively on Connected Android Phone
 ```bash
 flutter run
 ```
 
-### Run on Linux Desktop
+### 4. Run Natively on Linux Desktop
 ```bash
 flutter run -d linux
 ```
 
-### Build Standalone Release APK for Android (Google Play Store)
+### 5. Build Standalone Release APK
 ```bash
 flutter build apk --release
 ```
-📁 APK Output: `build/app/outputs/flutter-apk/app-release.apk`
+📁 Release APK saved at: `build/app/outputs/flutter-apk/app-release.apk`
 
 ---
 
-## 📄 License
+## ❓ Frequently Asked Questions (FAQ)
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+<details>
+<summary><b>1. Is FirmLedger completely free and offline?</b></summary>
+Yes. FirmLedger uses local SQLite database storage. All your transaction records, customer balances, and business settings remain 100% private on your device without needing cloud subscriptions or internet connection.
+</details>
 
-Copyright (c) 2026 **Wilam Toner**.
+<details>
+<summary><b>2. How does automatic credit ledger sync work?</b></summary>
+When creating an entry, if you select <code>Payment Method: Credit / On Account</code> and type the customer's or supplier's name, FirmLedger automatically records the transaction AND creates a corresponding Receivable or Payable entry in the Debt Ledger.
+</details>
+
+<details>
+<summary><b>3. Can I export my business data to Excel or Tally?</b></summary>
+Yes. Tap the download icon (📥) in the top navigation bar to instantly generate a formatted CSV statement containing transaction IDs, dates, types, party names, payment methods, and amounts.
+</details>
+
+---
+
+## 📄 License & Author
+
+Distributed under the **MIT License**. See [LICENSE](LICENSE) for details.
+
+Developed & Maintained by **[Wilam Toner](https://github.com/wilamtoner)**.
+
+---
+
+<p align="center">
+  ⭐ <b>If you find FirmLedger helpful, please consider giving this repository a star on GitHub!</b> ⭐
+</p>
