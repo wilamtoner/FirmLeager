@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'views/home_screen.dart';
+import 'views/splash_screen.dart';
 import 'providers/theme_provider.dart';
 
 void main() async {
@@ -22,7 +22,8 @@ void main() async {
 }
 
 class ExpenseDebtApp extends ConsumerWidget {
-  const ExpenseDebtApp({super.key});
+  final Widget? home;
+  const ExpenseDebtApp({super.key, this.home});
 
   static const Color emeraldGreen = Color(0xFF064E3B);
   static const Color mintAccent = Color(0xFF10B981);
@@ -87,7 +88,7 @@ class ExpenseDebtApp extends ConsumerWidget {
           ),
         ),
       ),
-      home: const HomeScreen(),
+      home: home ?? const SplashScreen(),
     );
   }
 }
