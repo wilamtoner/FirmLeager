@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 
@@ -8,7 +9,7 @@ class SplashScreen extends StatefulWidget {
 
   const SplashScreen({
     super.key,
-    this.duration = const Duration(milliseconds: 1800),
+    this.duration = const Duration(milliseconds: 2200),
     this.nextScreen,
   });
 
@@ -16,40 +17,99 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin {
+  late AnimationController _entranceController;
+  late AnimationController _pulseController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
   late Animation<double> _slideAnimation;
   Timer? _timer;
 
+  double _progress = 0.0;
+  String _statusMessage = '🔐 Initializing secure offline vault...';
+
+  // Ambient floating background symbols
+  final List<_FloatingSymbol> _ambientSymbols = const [
+    _FloatingSymbol(symbol: '₹', x: 0.15, y: 0.22, size: 28, delay: 0.0),
+    _FloatingSymbol(symbol: '\$', x: 0.82, y: 0.18, size: 24, delay: 0.3),
+    _FloatingSymbol(symbol: '€', x: 0.12, y: 0.72, size: 26, delay: 0.6),
+    _FloatingSymbol(symbol: '£', x: 0.85, y: 0.68, size: 22, delay: 0.2),
+    _FloatingSymbol(symbol: '¥', x: 0.78, y: 0.42, size: 20, delay: 0.5),
+    _FloatingSymbol(symbol: '📈', x: 0.22, y: 0.45, size: 20, delay: 0.8),
+  ];
+
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+
+    // 1. Entrance animation (scale, fade, slide)
+    _entranceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
     );
 
     _scaleAnimation = CurvedAnimation(
-      parent: _controller,
+      parent: _entranceController,
       curve: Curves.easeOutBack,
     );
 
     _fadeAnimation = CurvedAnimation(
-      parent: _controller,
+      parent: _entranceController,
       curve: const Interval(0.2, 1.0, curve: Curves.easeIn),
     );
 
-    _slideAnimation = Tween<double>(begin: 20.0, end: 0.0).animate(
+    _slideAnimation = Tween<double>(begin: 24.0, end: 0.0).animate(
       CurvedAnimation(
-        parent: _controller,
+        parent: _entranceController,
         curve: const Interval(0.3, 1.0, curve: Curves.easeOutCubic),
       ),
     );
 
-    _controller.forward();
-    _timer = Timer(widget.duration, _navigateToNext);
+    // 2. Continuous breathing & levitation pulse
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2400),
+    );
+
+    _entranceController.forward();
+    _pulseController.repeat();
+
+    // 3. Dynamic progress simulation & status updates
+    _startProgress();
+  }
+
+  void _startProgress() {
+    const totalSteps = 25;
+    final stepDuration = widget.duration.inMilliseconds / totalSteps;
+    int currentStep = 0;
+
+    Timer.periodic(Duration(milliseconds: stepDuration.round()), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      currentStep++;
+      final newProgress = math.min(1.0, currentStep / totalSteps);
+
+      setState(() {
+        _progress = newProgress;
+        if (_progress < 0.30) {
+          _statusMessage = '🔐 Initializing secure offline vault...';
+        } else if (_progress < 0.60) {
+          _statusMessage = '📊 Loading ledger accounts & category budgets...';
+        } else if (_progress < 0.88) {
+          _statusMessage = '💱 Syncing live market rates & debt engine...';
+        } else {
+          _statusMessage = '🚀 Ready! Welcome to FirmLedger...';
+        }
+      });
+
+      if (currentStep >= totalSteps) {
+        timer.cancel();
+        _pulseController.stop();
+        _navigateToNext();
+      }
+    });
   }
 
   void _navigateToNext() {
@@ -60,9 +120,12 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         pageBuilder: (ctx, animation, secondaryAnimation) =>
             widget.nextScreen ?? const HomeScreen(),
         transitionsBuilder: (ctx, animation, secondaryAnimation, child) {
-          return FadeTransition(opacity: animation, child: child);
+          return FadeTransition(
+            opacity: CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+            child: child,
+          );
         },
-        transitionDuration: const Duration(milliseconds: 400),
+        transitionDuration: const Duration(milliseconds: 450),
       ),
     );
   }
@@ -70,152 +133,349 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   void dispose() {
     _timer?.cancel();
-    _controller.dispose();
+    _entranceController.dispose();
+    _pulseController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     const darkGreen = Color(0xFF064E3B);
-    const deepNavy = Color(0xFF0F172A);
+    const deepNavy = Color(0xFF0B132B);
+    const emerald = Color(0xFF047857);
     const mintAccent = Color(0xFF10B981);
+    const brightMint = Color(0xFF34D399);
 
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [darkGreen, deepNavy],
+      body: Stack(
+        children: [
+          // A. Dynamic Atmospheric Gradient
+          AnimatedBuilder(
+            animation: _pulseController,
+            builder: (context, child) {
+              final pulse = math.sin(_pulseController.value * 2 * math.pi);
+              return Container(
+                width: double.infinity,
+                height: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    center: Alignment(0.0, -0.15 + (pulse * 0.05)),
+                    radius: 1.1 + (pulse * 0.08),
+                    colors: const [
+                      emerald,
+                      darkGreen,
+                      deepNavy,
+                    ],
+                    stops: const [0.0, 0.45, 1.0],
+                  ),
+                ),
+              );
+            },
           ),
-        ),
-        child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Spacer(flex: 2),
 
-              // 1. Animated App Logo
-              ScaleTransition(
-                scale: _scaleAnimation,
-                child: Container(
-                  width: 140,
-                  height: 140,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(32),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.35),
-                        blurRadius: 28,
-                        offset: const Offset(0, 12),
+          // B. Ambient Drifting Financial Symbols
+          ..._ambientSymbols.map((item) {
+            return AnimatedBuilder(
+              animation: _pulseController,
+              builder: (context, child) {
+                final offset = math.sin((_pulseController.value + item.delay) * 2 * math.pi) * 8;
+                return Positioned(
+                  left: MediaQuery.of(context).size.width * item.x,
+                  top: (MediaQuery.of(context).size.height * item.y) + offset,
+                  child: Opacity(
+                    opacity: 0.13 + (math.sin((_pulseController.value + item.delay) * math.pi) * 0.06),
+                    child: Text(
+                      item.symbol,
+                      style: TextStyle(
+                        fontSize: item.size,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
-                      BoxShadow(
-                        color: mintAccent.withValues(alpha: 0.3),
-                        blurRadius: 36,
-                        spreadRadius: 2,
-                        offset: const Offset(0, 4),
+                    ),
+                  ),
+                );
+              },
+            );
+          }),
+
+          // C. Center Content (Logo, Glow, Title, Status & Progress)
+          SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Spacer(flex: 3),
+
+                // 1. 3D Logo with Dynamic Orbital Halo & Floating Levitation
+                AnimatedBuilder(
+                  animation: _pulseController,
+                  builder: (context, child) {
+                    final levitation = math.sin(_pulseController.value * 2 * math.pi) * 5;
+                    final haloPulse = math.sin(_pulseController.value * 2 * math.pi) * 0.5 + 0.5;
+
+                    return Transform.translate(
+                      offset: Offset(0, levitation),
+                      child: ScaleTransition(
+                        scale: _scaleAnimation,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Glowing Ambient Radial Halo
+                            Container(
+                              width: 170,
+                              height: 170,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: RadialGradient(
+                                  colors: [
+                                    mintAccent.withValues(alpha: 0.35 + (haloPulse * 0.2)),
+                                    brightMint.withValues(alpha: 0.15),
+                                    Colors.transparent,
+                                  ],
+                                  stops: const [0.2, 0.65, 1.0],
+                                ),
+                              ),
+                            ),
+
+                            // Rotating Ambient Ring
+                            Transform.rotate(
+                              angle: _pulseController.value * 2 * math.pi,
+                              child: Container(
+                                width: 156,
+                                height: 156,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: mintAccent.withValues(alpha: 0.25),
+                                    width: 1.5,
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            // Master 3D Squircle Logo
+                            Container(
+                              width: 130,
+                              height: 130,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.4),
+                                    blurRadius: 28,
+                                    offset: const Offset(0, 14),
+                                  ),
+                                  BoxShadow(
+                                    color: mintAccent.withValues(alpha: 0.35),
+                                    blurRadius: 36,
+                                    spreadRadius: 2,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(30),
+                                child: Image.asset(
+                                  'assets/images/app_logo.png',
+                                  width: 130,
+                                  height: 130,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (ctx, _, __) => Container(
+                                    color: mintAccent,
+                                    child: const Icon(Icons.account_balance_wallet,
+                                        size: 64, color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 28),
+
+                // 2. Brand Name & Pill Badge
+                AnimatedBuilder(
+                  animation: _entranceController,
+                  builder: (context, child) {
+                    return Opacity(
+                      opacity: _fadeAnimation.value,
+                      child: Transform.translate(
+                        offset: Offset(0, _slideAnimation.value),
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: Column(
+                    children: [
+                      const Text(
+                        'FirmLedger',
+                        style: TextStyle(
+                          fontSize: 34,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 1.3,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: mintAccent.withValues(alpha: 0.35),
+                            width: 1,
+                          ),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.shield_outlined, size: 14, color: brightMint),
+                            SizedBox(width: 6),
+                            Text(
+                              'Small Business Accounting & Debt Engine',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.white70,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 0.4,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(32),
-                    child: Image.asset(
-                      'assets/images/app_logo.png',
-                      width: 140,
-                      height: 140,
-                      fit: BoxFit.cover,
-                      errorBuilder: (ctx, _, __) => Container(
-                        color: mintAccent,
-                        child: const Icon(Icons.account_balance_wallet, size: 64, color: Colors.white),
-                      ),
+                ),
+
+                const Spacer(flex: 3),
+
+                // 3. Dynamic Progress Bar, Percentage & Loading Status
+                FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                    child: Column(
+                      children: [
+                        // Dynamic Status Text with Smooth Transition
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          transitionBuilder: (child, animation) {
+                            return FadeTransition(
+                              opacity: animation,
+                              child: SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: const Offset(0.0, 0.25),
+                                  end: Offset.zero,
+                                ).animate(animation),
+                                child: child,
+                              ),
+                            );
+                          },
+                          child: Text(
+                            _statusMessage,
+                            key: ValueKey(_statusMessage),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.white70,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Sleek Gradient Progress Bar
+                        Stack(
+                          children: [
+                            // Progress Background Track
+                            Container(
+                              height: 6,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                            ),
+                            // Active Progress Fill
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                                return AnimatedContainer(
+                                  duration: const Duration(milliseconds: 150),
+                                  height: 6,
+                                  width: constraints.maxWidth * _progress,
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [mintAccent, brightMint, Colors.white],
+                                      stops: [0.0, 0.85, 1.0],
+                                    ),
+                                    borderRadius: BorderRadius.circular(6),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: mintAccent.withValues(alpha: 0.6),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+
+                        // Numeric Percentage & Version
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'v1.0.0 • Offline-First',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.white38,
+                                letterSpacing: 0.4,
+                              ),
+                            ),
+                            Text(
+                              '${(_progress * 100).toInt()}%',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: brightMint,
+                                fontFamily: 'monospace',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 24),
-
-              // 2. Animated Brand Title & Tagline
-              AnimatedBuilder(
-                animation: _controller,
-                builder: (context, child) {
-                  return Opacity(
-                    opacity: _fadeAnimation.value,
-                    child: Transform.translate(
-                      offset: Offset(0, _slideAnimation.value),
-                      child: child,
-                    ),
-                  );
-                },
-                child: Column(
-                  children: [
-                    const Text(
-                      'FirmLedger',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: mintAccent.withValues(alpha: 0.4),
-                          width: 1,
-                        ),
-                      ),
-                      child: const Text(
-                        'Small Business Accounting & Debt Engine',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.white70,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 0.4,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const Spacer(flex: 2),
-
-              // 3. Elegant Bottom Loader & Version Tag
-              FadeTransition(
-                opacity: _fadeAnimation,
-                child: const Column(
-                  children: [
-                    SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        valueColor: AlwaysStoppedAnimation<Color>(mintAccent),
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    Text(
-                      'v1.0.0 • Offline-First Enterprise',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.white38,
-                        letterSpacing: 0.6,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-            ],
+                const SizedBox(height: 24),
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
+}
+
+class _FloatingSymbol {
+  final String symbol;
+  final double x;
+  final double y;
+  final double size;
+  final double delay;
+
+  const _FloatingSymbol({
+    required this.symbol,
+    required this.x,
+    required this.y,
+    required this.size,
+    required this.delay,
+  });
 }
