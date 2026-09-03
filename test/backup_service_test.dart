@@ -36,10 +36,29 @@ void main() {
       expect(next.month, 2);
       expect(next.day, 15);
 
+      // Edge case: Jan 31 -> Feb 28 in non-leap year 2026
+      final jan31 = DateTime(2026, 1, 31);
+      final febClamped = r.calculateNextDate(jan31);
+      expect(febClamped.year, 2026);
+      expect(febClamped.month, 2);
+      expect(febClamped.day, 28);
+
+      // Edge case: Jan 31, 2024 (leap year) -> Feb 29, 2024
+      final jan31Leap = DateTime(2024, 1, 31);
+      final febClampedLeap = r.calculateNextDate(jan31Leap);
+      expect(febClampedLeap.year, 2024);
+      expect(febClampedLeap.month, 2);
+      expect(febClampedLeap.day, 29);
+
       // Weekly nextDate should advance 7 days
       final weeklyR = r.copyWith(frequency: RecurringFrequency.weekly);
       final weeklyNext = weeklyR.calculateNextDate(startDate);
       expect(weeklyNext.day, 22);
+
+      // Daily nextDate should advance 1 day
+      final dailyR = r.copyWith(frequency: RecurringFrequency.daily);
+      final dailyNext = dailyR.calculateNextDate(startDate);
+      expect(dailyNext.day, 16);
     });
   });
 

@@ -9,6 +9,14 @@ void main() {
       expect(Formatters.currency(99.99), '\$99.99');
     });
 
+    test('currency formats with custom currency symbols dynamically', () {
+      expect(Formatters.currency(5000, 'Rs'), 'Rs5,000.00');
+      expect(Formatters.currency(120.5, '€'), '€120.50');
+      expect(Formatters.currency(750, '₹'), '₹750.00');
+      expect(Formatters.currency(1000, '£'), '£1,000.00');
+      expect(Formatters.currency(0, 'Rs'), 'Rs0.00');
+    });
+
     test('date formats DateTime in MMM dd, yyyy format', () {
       final date = DateTime(2026, 9, 3);
       expect(Formatters.date(date), 'Sep 03, 2026');

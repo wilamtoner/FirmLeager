@@ -117,5 +117,31 @@ void main() {
       // High APR should be prioritized in avalanche
       expect(result.payoffOrder.first, 'High APR Debt');
     });
+
+    test('calculatePayoff with 0% APR incurs zero interest paid', () {
+      final debts = [
+        DebtModel(
+          id: '1',
+          title: 'Family Loan',
+          partyName: 'Relative',
+          isOwedByMe: true,
+          originalAmount: 1000,
+          currentBalance: 600,
+          apr: 0.0,
+          minMonthlyPayment: 200,
+          dueDate: DateTime.now(),
+        ),
+      ];
+
+      final result = DebtCalculator.calculatePayoff(
+        debts: debts,
+        extraMonthlyBudget: 0,
+        strategy: PayoffStrategy.snowball,
+      );
+
+      expect(result.totalInterestPaid, 0.0);
+      expect(result.totalAmountPaid, 600.0);
+      expect(result.totalMonths, 3); // 600 / 200 = 3 months
+    });
   });
 }
