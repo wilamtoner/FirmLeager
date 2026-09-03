@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../models/debt.dart';
 import '../providers/debt_provider.dart';
+import '../providers/firm_provider.dart';
 
 class AddDebtDialog extends ConsumerStatefulWidget {
   const AddDebtDialog({super.key});
@@ -55,6 +56,9 @@ class _AddDebtDialogState extends ConsumerState<AddDebtDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final firm = ref.watch(firmProvider);
+    final symbol = firm.currencySymbol;
+
     return AlertDialog(
       title: const Text('Add Debt / Loan'),
       content: SingleChildScrollView(
@@ -87,7 +91,7 @@ class _AddDebtDialogState extends ConsumerState<AddDebtDialog> {
               TextFormField(
                 controller: _amountController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(labelText: 'Initial Balance (\$)', border: OutlineInputBorder()),
+                decoration: InputDecoration(labelText: 'Initial Balance ($symbol)', border: const OutlineInputBorder()),
                 validator: (val) {
                   final p = val == null ? null : double.tryParse(val);
                   return p == null || p <= 0 ? 'Enter balance greater than 0' : null;
@@ -107,7 +111,7 @@ class _AddDebtDialogState extends ConsumerState<AddDebtDialog> {
               TextFormField(
                 controller: _minPaymentController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(labelText: 'Min Monthly Payment (\$)', border: OutlineInputBorder()),
+                decoration: InputDecoration(labelText: 'Min Monthly Payment ($symbol)', border: const OutlineInputBorder()),
                 validator: (val) {
                   final p = val == null ? null : double.tryParse(val);
                   return p == null || p < 0 ? 'Enter min payment (0 or higher)' : null;

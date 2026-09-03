@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/debt_provider.dart';
+import '../providers/firm_provider.dart';
 import '../utils/debt_calculator.dart';
 import '../utils/formatters.dart';
 
@@ -17,6 +18,8 @@ class _DebtPayoffScreenState extends ConsumerState<DebtPayoffScreen> {
   @override
   Widget build(BuildContext context) {
     final debts = ref.watch(debtProvider);
+    final firm = ref.watch(firmProvider);
+    final symbol = firm.currencySymbol;
     final activeDebts = debts.where((d) => d.isOwedByMe && d.currentBalance > 0).toList();
 
     final snowball = DebtCalculator.calculatePayoff(
@@ -47,14 +50,14 @@ class _DebtPayoffScreenState extends ConsumerState<DebtPayoffScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Extra Monthly Payment Budget: ${Formatters.currency(_extraBudget)}',
+                    Text('Extra Monthly Payment Budget: ${Formatters.currency(_extraBudget, symbol)}',
                         style: Theme.of(context).textTheme.titleMedium),
                     Slider(
                       value: _extraBudget,
                       min: 0,
                       max: 1000,
                       divisions: 20,
-                      label: Formatters.currency(_extraBudget),
+                      label: Formatters.currency(_extraBudget, symbol),
                       onChanged: (val) => setState(() => _extraBudget = val),
                     ),
                     Text(
@@ -77,6 +80,7 @@ class _DebtPayoffScreenState extends ConsumerState<DebtPayoffScreen> {
                     subtitle: 'Lowest Balance First',
                     result: snowball,
                     color: Colors.blue,
+                    symbol: symbol,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -87,6 +91,7 @@ class _DebtPayoffScreenState extends ConsumerState<DebtPayoffScreen> {
                     subtitle: 'Highest APR First',
                     result: avalanche,
                     color: Colors.deepOrange,
+                    symbol: symbol,
                   ),
                 ),
               ],
@@ -110,8 +115,8 @@ class _DebtPayoffScreenState extends ConsumerState<DebtPayoffScreen> {
                       return Card(
                         child: ListTile(
                           title: Text(d.title),
-                          subtitle: Text('APR: ${d.apr.toStringAsFixed(1)}% | Min: ${Formatters.currency(d.minMonthlyPayment)}/mo'),
-                          trailing: Text(Formatters.currency(d.currentBalance),
+                          subtitle: Text('APR: ${d.apr.toStringAsFixed(1)}% | Min: ${Formatters.currency(d.minMonthlyPayment, symbol)}/mo'),
+                          trailing: Text(Formatters.currency(d.currentBalance, symbol),
                               style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.redAccent)),
                         ),
                       );
@@ -129,6 +134,7 @@ class _DebtPayoffScreenState extends ConsumerState<DebtPayoffScreen> {
     required String subtitle,
     required DebtPayoffResult result,
     required Color color,
+    required String symbol,
   }) {
     return Card(
       color: color.withValues(alpha: 0.1),
@@ -150,7 +156,7 @@ class _DebtPayoffScreenState extends ConsumerState<DebtPayoffScreen> {
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 8),
             Text('Total Interest Paid:', style: Theme.of(context).textTheme.bodySmall),
-            Text(Formatters.currency(result.totalInterestPaid),
+            Text(Formatters.currency(result.totalInterestPaid, symbol),
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.red[700])),
           ],
         ),

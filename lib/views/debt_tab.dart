@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/debt_provider.dart';
+import '../providers/firm_provider.dart';
 import '../models/debt.dart';
 import '../utils/formatters.dart';
 import 'add_debt_dialog.dart';
@@ -11,7 +12,7 @@ class DebtTab extends ConsumerWidget {
 
   static const Color darkGreen = Color(0xFF064E3B);
 
-  void _showPaymentDialog(BuildContext context, WidgetRef ref, DebtModel debt) {
+  void _showPaymentDialog(BuildContext context, WidgetRef ref, DebtModel debt, String symbol) {
     final amountController = TextEditingController();
     showDialog(
       context: context,
@@ -20,12 +21,12 @@ class DebtTab extends ConsumerWidget {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Current Balance: ${Formatters.currency(debt.currentBalance)}'),
+            Text('Current Balance: ${Formatters.currency(debt.currentBalance, symbol)}'),
             const SizedBox(height: 12),
             TextField(
               controller: amountController,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(labelText: 'Payment Amount (\$)', border: OutlineInputBorder()),
+              decoration: InputDecoration(labelText: 'Payment Amount ($symbol)', border: const OutlineInputBorder()),
             ),
           ],
         ),
@@ -57,6 +58,8 @@ class DebtTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final debts = ref.watch(debtProvider);
+    final firm = ref.watch(firmProvider);
+    final symbol = firm.currencySymbol;
     final debtsIOwe = debts.where((d) => d.isOwedByMe).toList();
     final debtsOwedToMe = debts.where((d) => !d.isOwedByMe).toList();
 
@@ -108,11 +111,11 @@ class DebtTab extends ConsumerWidget {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(d.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                                  Text(Formatters.currency(d.currentBalance), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.red)),
+                                  Text(Formatters.currency(d.currentBalance, symbol), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.red)),
                                 ],
                               ),
                               const SizedBox(height: 4),
-                              Text('${d.partyName} • APR: ${d.apr.toStringAsFixed(1)}% • Min: ${Formatters.currency(d.minMonthlyPayment)}/mo'),
+                              Text('${d.partyName} • APR: ${d.apr.toStringAsFixed(1)}% • Min: ${Formatters.currency(d.minMonthlyPayment, symbol)}/mo'),
                               const SizedBox(height: 8),
                               LinearProgressIndicator(value: paidPct, backgroundColor: Colors.grey[300], color: Colors.green),
                               const SizedBox(height: 8),
@@ -121,7 +124,7 @@ class DebtTab extends ConsumerWidget {
                                 children: [
                                   Text('${(paidPct * 100).toStringAsFixed(0)}% Paid Off'),
                                   ElevatedButton.icon(
-                                    onPressed: () => _showPaymentDialog(context, ref, d),
+                                    onPressed: () => _showPaymentDialog(context, ref, d, symbol),
                                     icon: const Icon(Icons.payment, size: 16),
                                     label: const Text('Log Payment'),
                                   ),
@@ -151,7 +154,7 @@ class DebtTab extends ConsumerWidget {
                         child: ListTile(
                           title: Text(d.title),
                           subtitle: Text('Borrower: ${d.partyName}'),
-                          trailing: Text(Formatters.currency(d.currentBalance), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green)),
+                          trailing: Text(Formatters.currency(d.currentBalance, symbol), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green)),
                         ),
                       );
                     },
