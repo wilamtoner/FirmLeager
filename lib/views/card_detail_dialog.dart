@@ -11,16 +11,17 @@ enum DetailCardType { income, expense, receivables, payables }
 
 class CardDetailDialog extends ConsumerWidget {
   final DetailCardType cardType;
+  final DateTimeRange? dateRange;
 
-  const CardDetailDialog({super.key, required this.cardType});
+  const CardDetailDialog({super.key, required this.cardType, this.dateRange});
 
-  static void showMobileBottomSheet(BuildContext context, DetailCardType type) {
+  static void showMobileBottomSheet(BuildContext context, DetailCardType type, {DateTimeRange? dateRange}) {
     HapticFeedback.lightImpact();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => CardDetailDialog(cardType: type),
+      builder: (ctx) => CardDetailDialog(cardType: type, dateRange: dateRange),
     );
   }
 
@@ -97,7 +98,15 @@ class CardDetailDialog extends ConsumerWidget {
     if (cardType == DetailCardType.income || cardType == DetailCardType.expense) {
       final transactions = ref.watch(transactionProvider);
       final targetType = cardType == DetailCardType.income ? TransactionType.income : TransactionType.expense;
-      final filtered = transactions.where((t) => t.type == targetType).toList();
+      var filtered = transactions.where((t) => t.type == targetType).toList();
+
+      if (dateRange != null) {
+        final start = DateTime(dateRange!.start.year, dateRange!.start.month, dateRange!.start.day, 0, 0, 0);
+        final end = DateTime(dateRange!.end.year, dateRange!.end.month, dateRange!.end.day, 23, 59, 59);
+        filtered = filtered.where((t) =>
+            (t.date.isAfter(start) || t.date.isAtSameMomentAs(start)) &&
+            (t.date.isBefore(end) || t.date.isAtSameMomentAs(end))).toList();
+      }
 
       if (filtered.isEmpty) {
         return const Center(child: Text('No transaction records found.'));

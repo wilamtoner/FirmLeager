@@ -9,6 +9,8 @@ import 'debt_payoff_screen.dart';
 class DebtTab extends ConsumerWidget {
   const DebtTab({super.key});
 
+  static const Color darkGreen = Color(0xFF064E3B);
+
   void _showPaymentDialog(BuildContext context, WidgetRef ref, DebtModel debt) {
     final amountController = TextEditingController();
     showDialog(
@@ -30,6 +32,10 @@ class DebtTab extends ConsumerWidget {
         actions: [
           TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: darkGreen,
+              foregroundColor: Colors.white,
+            ),
             onPressed: () {
               final amt = double.tryParse(amountController.text);
               if (amt != null && amt > 0) {
@@ -154,6 +160,8 @@ class DebtTab extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: darkGreen,
+        foregroundColor: Colors.white,
         onPressed: () {
           showDialog(context: context, builder: (ctx) => const AddDebtDialog());
         },

@@ -88,21 +88,30 @@ class _AddDebtDialogState extends ConsumerState<AddDebtDialog> {
                 controller: _amountController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 decoration: const InputDecoration(labelText: 'Initial Balance (\$)', border: OutlineInputBorder()),
-                validator: (val) => val == null || double.tryParse(val) == null ? 'Enter valid balance' : null,
+                validator: (val) {
+                  final p = val == null ? null : double.tryParse(val);
+                  return p == null || p <= 0 ? 'Enter balance greater than 0' : null;
+                },
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _aprController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 decoration: const InputDecoration(labelText: 'Interest Rate (APR %)', border: OutlineInputBorder()),
-                validator: (val) => val == null || double.tryParse(val) == null ? 'Enter valid APR' : null,
+                validator: (val) {
+                  final p = val == null ? null : double.tryParse(val);
+                  return p == null || p < 0 ? 'Enter valid APR (0 or higher)' : null;
+                },
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _minPaymentController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 decoration: const InputDecoration(labelText: 'Min Monthly Payment (\$)', border: OutlineInputBorder()),
-                validator: (val) => val == null || double.tryParse(val) == null ? 'Enter min payment' : null,
+                validator: (val) {
+                  final p = val == null ? null : double.tryParse(val);
+                  return p == null || p < 0 ? 'Enter min payment (0 or higher)' : null;
+                },
               ),
             ],
           ),
@@ -110,7 +119,14 @@ class _AddDebtDialogState extends ConsumerState<AddDebtDialog> {
       ),
       actions: [
         TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
-        ElevatedButton(onPressed: _submit, child: const Text('Save Debt')),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF064E3B),
+            foregroundColor: Colors.white,
+          ),
+          onPressed: _submit,
+          child: const Text('Save Debt'),
+        ),
       ],
     );
   }

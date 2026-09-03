@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import '../models/transaction.dart';
 import '../models/debt.dart';
+import '../models/category.dart';
 import '../providers/transaction_provider.dart';
 import '../providers/debt_provider.dart';
 import '../providers/category_provider.dart';
@@ -26,6 +27,7 @@ class _NewTransactionScreenState extends ConsumerState<NewTransactionScreen> {
   late TransactionType _transactionType;
   IncomeType _incomeType = IncomeType.goods;
   PaymentMethod _paymentMethod = PaymentMethod.cash;
+  String? _selectedCategoryId;
 
   final _titleController = TextEditingController();
   final _partyController = TextEditingController();
@@ -68,7 +70,18 @@ class _NewTransactionScreenState extends ConsumerState<NewTransactionScreen> {
       final categories = ref.read(categoryProvider);
       final partyName = _partyController.text.trim();
 
-      String categoryId = categories.isNotEmpty ? categories.first.id : 'general';
+      String categoryId;
+      if (_transactionType == TransactionType.income) {
+        final incomeCat = categories.firstWhere(
+          (c) => c.name.toLowerCase().contains('income'),
+          orElse: () => categories.isNotEmpty ? categories.first : CategoryModel(id: 'cat_income', name: 'Salary & Income', colorHex: 0xFF009688),
+        );
+        categoryId = incomeCat.id;
+      } else {
+        categoryId = _selectedCategoryId ??
+            (categories.where((c) => !c.name.toLowerCase().contains('income')).firstOrNull?.id ??
+                (categories.isNotEmpty ? categories.first.id : 'cat_utilities'));
+      }
 
       final transaction = TransactionModel(
         id: const Uuid().v4(),
@@ -167,9 +180,10 @@ class _NewTransactionScreenState extends ConsumerState<NewTransactionScreen> {
                 ),
                 const SizedBox(height: 6),
                 DropdownButtonFormField<IncomeType>(
+                  key: ValueKey('type_dropdown_${_transactionType.name}'),
                   isExpanded: true,
                   isDense: true,
-                  value: _incomeType,
+                  initialValue: _incomeType,
                   decoration: InputDecoration(
                     hintText: 'Select...',
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -192,6 +206,36 @@ class _NewTransactionScreenState extends ConsumerState<NewTransactionScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
+
+                if (!isIncome) ...[
+                  const Text(
+                    'Expense Category*',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
+                  const SizedBox(height: 6),
+                  DropdownButtonFormField<String>(
+                    key: const ValueKey('expense_category_dropdown'),
+                    isExpanded: true,
+                    isDense: true,
+                    initialValue: _selectedCategoryId ??
+                        (ref.watch(categoryProvider).where((c) => !c.name.toLowerCase().contains('income')).firstOrNull?.id),
+                    decoration: InputDecoration(
+                      hintText: 'Select Category...',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    ),
+                    items: ref
+                        .watch(categoryProvider)
+                        .where((c) => !c.name.toLowerCase().contains('income'))
+                        .map((c) => DropdownMenuItem(value: c.id, child: Text(c.name)))
+                        .toList(),
+                    onChanged: (val) {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      if (val != null) setState(() => _selectedCategoryId = val);
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                ],
 
                 // Product or Service Name Input
                 const Text(
@@ -220,7 +264,7 @@ class _NewTransactionScreenState extends ConsumerState<NewTransactionScreen> {
                 DropdownButtonFormField<PaymentMethod>(
                   isExpanded: true,
                   isDense: true,
-                  value: _paymentMethod,
+                  initialValue: _paymentMethod,
                   decoration: InputDecoration(
                     hintText: 'Select...',
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -278,7 +322,8 @@ class _NewTransactionScreenState extends ConsumerState<NewTransactionScreen> {
                   ),
                   validator: (val) {
                     if (val == null || val.trim().isEmpty) return 'Enter amount';
-                    if (double.tryParse(val) == null) return 'Enter a valid number';
+                    final parsed = double.tryParse(val);
+                    if (parsed == null || parsed <= 0) return 'Enter a valid amount greater than 0';
                     return null;
                   },
                 ),

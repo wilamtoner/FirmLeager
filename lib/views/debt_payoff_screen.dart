@@ -131,7 +131,7 @@ class _DebtPayoffScreenState extends ConsumerState<DebtPayoffScreen> {
     required Color color,
   }) {
     return Card(
-      color: color.withOpacity(0.1),
+      color: color.withValues(alpha: 0.1),
       shape: RoundedRectangleBorder(
         side: BorderSide(color: color, width: 2),
         borderRadius: BorderRadius.circular(12),

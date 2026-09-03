@@ -25,7 +25,7 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -85,6 +85,11 @@ class DatabaseService {
       )
     ''');
 
+    // Indexes for high performance querying
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions(date)');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_transactions_category ON transactions(categoryId)');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_debts_owed ON debts(isOwedByMe)');
+
     // Seed Default Categories
     await _seedDefaultCategories(db);
   }
@@ -99,6 +104,13 @@ class DatabaseService {
       } catch (_) {}
       try {
         await db.execute('ALTER TABLE transactions ADD COLUMN partyName TEXT');
+      } catch (_) {}
+    }
+    if (oldVersion < 3) {
+      try {
+        await db.execute('CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions(date)');
+        await db.execute('CREATE INDEX IF NOT EXISTS idx_transactions_category ON transactions(categoryId)');
+        await db.execute('CREATE INDEX IF NOT EXISTS idx_debts_owed ON debts(isOwedByMe)');
       } catch (_) {}
     }
   }

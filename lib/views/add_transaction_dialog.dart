@@ -20,7 +20,7 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
 
   TransactionType _type = TransactionType.expense;
   String? _selectedCategoryId;
-  DateTime _selectedDate = DateTime.now();
+  final DateTime _selectedDate = DateTime.now();
 
   @override
   void dispose() {
@@ -98,7 +98,7 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: _selectedCategoryId ?? (categories.isNotEmpty ? categories.first.id : null),
+                initialValue: _selectedCategoryId ?? (categories.isNotEmpty ? categories.first.id : null),
                 decoration: const InputDecoration(labelText: 'Category', border: OutlineInputBorder()),
                 items: categories
                     .map((c) => DropdownMenuItem(value: c.id, child: Text(c.name)))
@@ -116,7 +116,14 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
       ),
       actions: [
         TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
-        ElevatedButton(onPressed: _submit, child: const Text('Save')),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF064E3B),
+            foregroundColor: Colors.white,
+          ),
+          onPressed: _submit,
+          child: const Text('Save'),
+        ),
       ],
     );
   }

@@ -42,7 +42,7 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
   }
 
   void _openDetail(DetailCardType type) {
-    CardDetailDialog.showMobileBottomSheet(context, type);
+    CardDetailDialog.showMobileBottomSheet(context, type, dateRange: _dateRange);
   }
 
   Future<void> _exportCsv() async {
@@ -133,7 +133,7 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: darkGreen.withOpacity(0.3),
+                      color: darkGreen.withValues(alpha: 0.3),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -158,7 +158,7 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
+                            color: Colors.white.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
@@ -387,9 +387,9 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.12),
+            color: color.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: color.withOpacity(0.3), width: 1),
+            border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
           ),
           child: Column(
             children: [
@@ -425,7 +425,7 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 6,
             offset: const Offset(0, 2),
           )
@@ -518,47 +518,50 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
     final incomePct = (income / total) * 100;
     final expensePct = (expenses / total) * 100;
 
-    return Column(
-      children: [
-        SizedBox(
-          height: 160,
-          child: PieChart(
-            PieChartData(
-              sectionsSpace: 2,
-              centerSpaceRadius: 35,
-              sections: [
-                PieChartSectionData(
-                  value: income,
-                  color: Colors.lightGreen,
-                  title: '${incomePct.toStringAsFixed(1)}%',
-                  radius: 40,
-                  titleStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 11),
-                ),
-                PieChartSectionData(
-                  value: expenses,
-                  color: Colors.redAccent,
-                  title: '${expensePct.toStringAsFixed(1)}%',
-                  radius: 40,
-                  titleStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 11),
-                ),
-              ],
+    return RepaintBoundary(
+      child: Column(
+        children: [
+          SizedBox(
+            height: 160,
+            child: PieChart(
+              PieChartData(
+                sectionsSpace: 2,
+                centerSpaceRadius: 35,
+                sections: [
+                  PieChartSectionData(
+                    value: income,
+                    color: Colors.lightGreen,
+                    title: '${incomePct.toStringAsFixed(1)}%',
+                    radius: 40,
+                    titleStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 11),
+                  ),
+                  PieChartSectionData(
+                    value: expenses,
+                    color: Colors.redAccent,
+                    title: '${expensePct.toStringAsFixed(1)}%',
+                    radius: 40,
+                    titleStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 11),
+                  ),
+                ],
+              ),
+              swapAnimationDuration: Duration.zero,
             ),
           ),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const CircleAvatar(radius: 5, backgroundColor: Colors.lightGreen),
-            const SizedBox(width: 4),
-            Text('Income: ${incomePct.toStringAsFixed(2)}%', style: const TextStyle(fontSize: 12)),
-            const SizedBox(width: 16),
-            const CircleAvatar(radius: 5, backgroundColor: Colors.redAccent),
-            const SizedBox(width: 4),
-            Text('Expense: ${expensePct.toStringAsFixed(2)}%', style: const TextStyle(fontSize: 12)),
-          ],
-        )
-      ],
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircleAvatar(radius: 5, backgroundColor: Colors.lightGreen),
+              const SizedBox(width: 4),
+              Text('Income: ${incomePct.toStringAsFixed(2)}%', style: const TextStyle(fontSize: 12)),
+              const SizedBox(width: 16),
+              const CircleAvatar(radius: 5, backgroundColor: Colors.redAccent),
+              const SizedBox(width: 4),
+              Text('Expense: ${expensePct.toStringAsFixed(2)}%', style: const TextStyle(fontSize: 12)),
+            ],
+          )
+        ],
+      ),
     );
   }
 
@@ -575,44 +578,47 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
 
     final maxY = (receivables > payables ? receivables : payables) * 1.2;
 
-    return SizedBox(
-      height: 160,
-      child: BarChart(
-        BarChartData(
-          alignment: BarChartAlignment.spaceAround,
-          maxY: maxY > 0 ? maxY : 100,
-          barTouchData: BarTouchData(enabled: false),
-          titlesData: FlTitlesData(
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (val, meta) {
-                  if (val == 0) return const Text('Receivables', style: TextStyle(fontSize: 11));
-                  if (val == 1) return const Text('Payables', style: TextStyle(fontSize: 11));
-                  return const Text('');
-                },
+    return RepaintBoundary(
+      child: SizedBox(
+        height: 160,
+        child: BarChart(
+          BarChartData(
+            alignment: BarChartAlignment.spaceAround,
+            maxY: maxY > 0 ? maxY : 100,
+            barTouchData: BarTouchData(enabled: false),
+            titlesData: FlTitlesData(
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (val, meta) {
+                    if (val == 0) return const Text('Receivables', style: TextStyle(fontSize: 11));
+                    if (val == 1) return const Text('Payables', style: TextStyle(fontSize: 11));
+                    return const Text('');
+                  },
+                ),
               ),
+              leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             ),
-            leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            gridData: const FlGridData(show: false),
+            borderData: FlBorderData(show: false),
+            barGroups: [
+              BarChartGroupData(
+                x: 0,
+                barRods: [
+                  BarChartRodData(toY: receivables, color: darkGreen, width: 22, borderRadius: BorderRadius.circular(4)),
+                ],
+              ),
+              BarChartGroupData(
+                x: 1,
+                barRods: [
+                  BarChartRodData(toY: payables, color: Colors.redAccent, width: 22, borderRadius: BorderRadius.circular(4)),
+                ],
+              ),
+            ],
           ),
-          gridData: const FlGridData(show: false),
-          borderData: FlBorderData(show: false),
-          barGroups: [
-            BarChartGroupData(
-              x: 0,
-              barRods: [
-                BarChartRodData(toY: receivables, color: darkGreen, width: 22, borderRadius: BorderRadius.circular(4)),
-              ],
-            ),
-            BarChartGroupData(
-              x: 1,
-              barRods: [
-                BarChartRodData(toY: payables, color: Colors.redAccent, width: 22, borderRadius: BorderRadius.circular(4)),
-              ],
-            ),
-          ],
+          swapAnimationDuration: Duration.zero,
         ),
       ),
     );

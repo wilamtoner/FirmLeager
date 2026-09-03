@@ -40,6 +40,8 @@ class _ExpenseTabState extends ConsumerState<ExpenseTab> {
       return matchesSearch && matchesFilter;
     }).toList();
 
+    final categoryMap = {for (var c in categories) c.id: c};
+
     return Scaffold(
       body: Column(
         children: [
@@ -95,12 +97,8 @@ class _ExpenseTabState extends ConsumerState<ExpenseTab> {
                     itemCount: filtered.length,
                     itemBuilder: (ctx, idx) {
                       final t = filtered[idx];
-                      CategoryModel cat;
-                      try {
-                        cat = categories.firstWhere((c) => c.id == t.categoryId);
-                      } catch (_) {
-                        cat = CategoryModel(id: 'other', name: 'General', colorHex: 0xFF9E9E9E);
-                      }
+                      final cat = categoryMap[t.categoryId] ??
+                          CategoryModel(id: 'other', name: 'General', colorHex: 0xFF9E9E9E);
 
                       return Dismissible(
                         key: Key(t.id),
@@ -175,7 +173,7 @@ class _ExpenseTabState extends ConsumerState<ExpenseTab> {
     return ChoiceChip(
       label: Text(label),
       selected: isSelected,
-      selectedColor: darkGreen.withOpacity(0.15),
+      selectedColor: darkGreen.withValues(alpha: 0.15),
       labelStyle: TextStyle(
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
         color: isSelected ? darkGreen : Colors.grey.shade700,

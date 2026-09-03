@@ -1,9 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/transaction.dart';
-import '../models/category.dart';
 import 'transaction_provider.dart';
 import 'debt_provider.dart';
-import 'category_provider.dart';
 
 class DashboardSummary {
   final double totalIncome;

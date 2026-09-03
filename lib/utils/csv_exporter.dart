@@ -22,7 +22,14 @@ class CsvExporter {
 
     buffer.writeln('Transaction ID,Date,Type,Category/Item,Party Name,Payment Method,Amount (${firm.currencySymbol})');
 
-    for (var t in transactions) {
+    final start = DateTime(dateRange.start.year, dateRange.start.month, dateRange.start.day, 0, 0, 0);
+    final end = DateTime(dateRange.end.year, dateRange.end.month, dateRange.end.day, 23, 59, 59);
+
+    final filtered = transactions.where((t) =>
+        (t.date.isAfter(start) || t.date.isAtSameMomentAs(start)) &&
+        (t.date.isBefore(end) || t.date.isAtSameMomentAs(end))).toList();
+
+    for (var t in filtered) {
       final dateStr = dateFormat.format(t.date);
       final typeStr = t.type.name.toUpperCase();
       final titleStr = '"${t.title.replaceAll('"', '""')}"';

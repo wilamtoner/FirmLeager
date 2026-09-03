@@ -54,7 +54,7 @@ class ExpenseDebtApp extends ConsumerWidget {
         ),
         cardTheme: CardThemeData(
           elevation: 1,
-          shadowColor: Colors.black.withOpacity(0.05),
+          shadowColor: Colors.black.withValues(alpha: 0.05),
           shape: RoundedRectangleBorder(
             side: BorderSide(color: Colors.green.shade100, width: 1),
             borderRadius: BorderRadius.circular(16),
@@ -80,7 +80,7 @@ class ExpenseDebtApp extends ConsumerWidget {
         ),
         cardTheme: CardThemeData(
           elevation: 2,
-          shadowColor: Colors.black.withOpacity(0.3),
+          shadowColor: Colors.black.withValues(alpha: 0.3),
           shape: RoundedRectangleBorder(
             side: const BorderSide(color: Color(0xFF334155), width: 1),
             borderRadius: BorderRadius.circular(16),

@@ -121,7 +121,7 @@ class _EditFirmDialogState extends ConsumerState<EditFirmDialog> {
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   isExpanded: true,
-                  value: _currency,
+                  initialValue: _currency,
                   decoration: const InputDecoration(labelText: 'Currency Symbol', border: OutlineInputBorder()),
                   items: const [
                     DropdownMenuItem(value: 'Rs.', child: Text('Rs. (Nepalese/Indian Rupee)')),
