@@ -228,6 +228,7 @@ class _ExpenseTabState extends ConsumerState<ExpenseTab> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'fab_expense_tab',
         backgroundColor: darkGreen,
         foregroundColor: Colors.white,
         onPressed: () {

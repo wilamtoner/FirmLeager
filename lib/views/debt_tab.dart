@@ -163,6 +163,7 @@ class DebtTab extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'fab_debt_tab',
         backgroundColor: darkGreen,
         foregroundColor: Colors.white,
         onPressed: () {
