@@ -44,24 +44,22 @@ class _CurrencyConverterDialogState extends ConsumerState<CurrencyConverterDialo
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 480),
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Header
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Row(
-                    children: [
-                      Text('💱', style: TextStyle(fontSize: 24)),
-                      SizedBox(width: 8),
-                      Text(
-                        'Live Currency Converter',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                      ),
-                    ],
+                  const Text('💱', style: TextStyle(fontSize: 22)),
+                  const SizedBox(width: 8),
+                  const Expanded(
+                    child: Text(
+                      'Live Currency Converter',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                   IconButton(
                     icon: state.isLoading
@@ -76,7 +74,7 @@ class _CurrencyConverterDialogState extends ConsumerState<CurrencyConverterDialo
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
 
               // Live Status Badge
               Container(
@@ -115,12 +113,13 @@ class _CurrencyConverterDialogState extends ConsumerState<CurrencyConverterDialo
               ),
               const SizedBox(height: 20),
 
-              // Input Amount
+              // Input Amount Field
               TextField(
                 controller: _amountController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 decoration: InputDecoration(
-                  labelText: 'Amount (${fromInfo.symbol})',
+                  labelText: 'Amount to Convert',
+                  hintText: '0.00',
                   prefixIcon: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Center(
@@ -142,17 +141,22 @@ class _CurrencyConverterDialogState extends ConsumerState<CurrencyConverterDialo
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<String>(
+                      isExpanded: true,
                       key: ValueKey('from_${state.fromCurrency}'),
                       initialValue: state.fromCurrency,
                       decoration: InputDecoration(
                         labelText: 'From',
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       items: CurrencyService.supportedCurrencies.map((c) {
                         return DropdownMenuItem(
                           value: c.code,
-                          child: Text('${c.flagEmoji} ${c.code} (${c.symbol})', style: const TextStyle(fontSize: 13)),
+                          child: Text(
+                            '${c.flagEmoji} ${c.code}',
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                          ),
                         );
                       }).toList(),
                       onChanged: (val) {
@@ -167,17 +171,22 @@ class _CurrencyConverterDialogState extends ConsumerState<CurrencyConverterDialo
                   ),
                   Expanded(
                     child: DropdownButtonFormField<String>(
+                      isExpanded: true,
                       key: ValueKey('to_${state.toCurrency}'),
                       initialValue: state.toCurrency,
                       decoration: InputDecoration(
                         labelText: 'To',
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       items: CurrencyService.supportedCurrencies.map((c) {
                         return DropdownMenuItem(
                           value: c.code,
-                          child: Text('${c.flagEmoji} ${c.code} (${c.symbol})', style: const TextStyle(fontSize: 13)),
+                          child: Text(
+                            '${c.flagEmoji} ${c.code}',
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                          ),
                         );
                       }).toList(),
                       onChanged: (val) {
@@ -211,19 +220,22 @@ class _CurrencyConverterDialogState extends ConsumerState<CurrencyConverterDialo
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'CONVERTED ESTIMATE',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.8),
-                            fontSize: 11,
-                            letterSpacing: 1.2,
-                            fontWeight: FontWeight.bold,
+                        Expanded(
+                          child: Text(
+                            'CONVERTED ESTIMATE',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.8),
+                              fontSize: 10,
+                              letterSpacing: 1.1,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
+                        const SizedBox(width: 6),
                         Text(
-                          '1 ${state.fromCurrency} = ${unitRate.toStringAsFixed(4)} ${state.toCurrency}',
+                          '1 ${state.fromCurrency} = ${unitRate.toStringAsFixed(3)} ${state.toCurrency}',
                           style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.8),
                             fontSize: 11,
