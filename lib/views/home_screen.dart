@@ -129,44 +129,107 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ref.read(themeModeProvider.notifier).toggleTheme();
             },
           ),
-          // CSV Statement Export
-          IconButton(
-            icon: const Icon(Icons.table_chart_outlined, color: Colors.white),
-            tooltip: 'Export CSV Statement',
-            onPressed: _exportCsv,
-          ),
-          // PDF Statement Export
-          IconButton(
-            icon: const Icon(Icons.picture_as_pdf_outlined, color: Colors.white),
-            tooltip: 'Export PDF Statement',
-            onPressed: _exportPdf,
-          ),
-          // JSON Database Backup
-          IconButton(
-            icon: const Icon(Icons.backup_outlined, color: Colors.white),
-            tooltip: 'Backup Database (JSON)',
-            onPressed: _backupData,
-          ),
-          // Edit Firm Details Button
-          Padding(
-            padding: const EdgeInsets.only(right: 12.0),
-            child: Center(
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: darkGreen,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          if (MediaQuery.of(context).size.width >= 600) ...[
+            // Desktop/Tablet Toolbar
+            IconButton(
+              icon: const Icon(Icons.table_chart_outlined, color: Colors.white),
+              tooltip: 'Export CSV Statement',
+              onPressed: _exportCsv,
+            ),
+            IconButton(
+              icon: const Icon(Icons.picture_as_pdf_outlined, color: Colors.white),
+              tooltip: 'Export PDF Statement',
+              onPressed: _exportPdf,
+            ),
+            IconButton(
+              icon: const Icon(Icons.backup_outlined, color: Colors.white),
+              tooltip: 'Backup Database (JSON)',
+              onPressed: _backupData,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 12.0),
+              child: Center(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: darkGreen,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  onPressed: () {
+                    EditFirmDialog.showMobileBottomSheet(context);
+                  },
+                  child: const Text('Edit', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
-                onPressed: () {
-                  EditFirmDialog.showMobileBottomSheet(context);
-                },
-                child: const Text('Edit', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             ),
-          )
+          ] else ...[
+            // Mobile Overflow Popup Menu
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert, color: Colors.white),
+              tooltip: 'More actions',
+              onSelected: (val) {
+                switch (val) {
+                  case 'edit':
+                    EditFirmDialog.showMobileBottomSheet(context);
+                    break;
+                  case 'pdf':
+                    _exportPdf();
+                    break;
+                  case 'csv':
+                    _exportCsv();
+                    break;
+                  case 'backup':
+                    _backupData();
+                    break;
+                }
+              },
+              itemBuilder: (ctx) => const [
+                PopupMenuItem(
+                  value: 'edit',
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit, size: 18),
+                      SizedBox(width: 8),
+                      Text('Edit Firm Info'),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'pdf',
+                  child: Row(
+                    children: [
+                      Icon(Icons.picture_as_pdf, size: 18),
+                      SizedBox(width: 8),
+                      Text('Export PDF Statement'),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'csv',
+                  child: Row(
+                    children: [
+                      Icon(Icons.table_chart, size: 18),
+                      SizedBox(width: 8),
+                      Text('Export CSV File'),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'backup',
+                  child: Row(
+                    children: [
+                      Icon(Icons.backup, size: 18),
+                      SizedBox(width: 8),
+                      Text('Backup Database'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
       body: IndexedStack(

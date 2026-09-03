@@ -195,76 +195,79 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
             const SizedBox(height: 16),
 
             // 2. Mobile Quick Action Bar
-            Row(
-              children: [
-                _buildQuickActionButton(
-                  context,
-                  label: '+ Income',
-                  color: Colors.green.shade700,
-                  icon: Icons.add_circle_outline,
-                  onTap: () {
-                    HapticFeedback.lightImpact();
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (ctx) => const NewTransactionScreen(initialType: TransactionType.income)),
-                    );
-                  },
-                ),
-                const SizedBox(width: 8),
-                _buildQuickActionButton(
-                  context,
-                  label: '- Expense',
-                  color: Colors.red.shade700,
-                  icon: Icons.remove_circle_outline,
-                  onTap: () {
-                    HapticFeedback.lightImpact();
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (ctx) => const NewTransactionScreen(initialType: TransactionType.expense)),
-                    );
-                  },
-                ),
-                const SizedBox(width: 8),
-                _buildQuickActionButton(
-                  context,
-                  label: '+ Credit',
-                  color: Colors.amber.shade800,
-                  icon: Icons.credit_score,
-                  onTap: () {
-                    HapticFeedback.lightImpact();
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (ctx) => const NewTransactionScreen(initialType: TransactionType.income)),
-                    );
-                  },
-                ),
-                const SizedBox(width: 8),
-                _buildQuickActionButton(
-                  context,
-                  label: '📥 CSV',
-                  color: Colors.indigo.shade700,
-                  icon: Icons.download,
-                  onTap: _exportCsv,
-                ),
-                const SizedBox(width: 8),
-                _buildQuickActionButton(
-                  context,
-                  label: '📄 PDF',
-                  color: Colors.teal.shade800,
-                  icon: Icons.picture_as_pdf,
-                  onTap: _exportPdf,
-                ),
-                const SizedBox(width: 8),
-                _buildQuickActionButton(
-                  context,
-                  label: '💱 Convert',
-                  color: Colors.blueGrey.shade800,
-                  icon: Icons.currency_exchange,
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (ctx) => const CurrencyConverterDialog(),
-                    );
-                  },
-                ),
-              ],
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _buildQuickActionButton(
+                    context,
+                    label: '+ Income',
+                    color: Colors.green.shade700,
+                    icon: Icons.add_circle_outline,
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (ctx) => const NewTransactionScreen(initialType: TransactionType.income)),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  _buildQuickActionButton(
+                    context,
+                    label: '- Expense',
+                    color: Colors.red.shade700,
+                    icon: Icons.remove_circle_outline,
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (ctx) => const NewTransactionScreen(initialType: TransactionType.expense)),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  _buildQuickActionButton(
+                    context,
+                    label: '+ Credit',
+                    color: Colors.amber.shade800,
+                    icon: Icons.credit_score,
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (ctx) => const NewTransactionScreen(initialType: TransactionType.income)),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  _buildQuickActionButton(
+                    context,
+                    label: '📥 CSV',
+                    color: Colors.indigo.shade700,
+                    icon: Icons.download,
+                    onTap: _exportCsv,
+                  ),
+                  const SizedBox(width: 8),
+                  _buildQuickActionButton(
+                    context,
+                    label: '📄 PDF',
+                    color: Colors.teal.shade800,
+                    icon: Icons.picture_as_pdf,
+                    onTap: _exportPdf,
+                  ),
+                  const SizedBox(width: 8),
+                  _buildQuickActionButton(
+                    context,
+                    label: '💱 Convert',
+                    color: Colors.blueGrey.shade800,
+                    icon: Icons.currency_exchange,
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => const CurrencyConverterDialog(),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 16),
 
@@ -416,27 +419,26 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
     required IconData icon,
     required VoidCallback onTap,
   }) {
-    return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(10),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
-          ),
-          child: Column(
-            children: [
-              Icon(icon, color: color, size: 18),
-              const SizedBox(height: 2),
-              Text(
-                label,
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: color),
-              ),
-            ],
-          ),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: color, size: 18),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: color),
+            ),
+          ],
         ),
       ),
     );
