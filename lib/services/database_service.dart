@@ -5,6 +5,7 @@ import '../models/transaction.dart';
 import '../models/category.dart';
 import '../models/debt.dart';
 import '../models/debt_payment.dart';
+import '../models/recurring_transaction.dart';
 
 class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
@@ -25,7 +26,7 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 3,
+      version: 4,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -85,6 +86,25 @@ class DatabaseService {
       )
     ''');
 
+    // Recurring Transactions Table
+    await db.execute('''
+      CREATE TABLE recurring_transactions (
+        id TEXT PRIMARY KEY,
+        title TEXT NOT NULL,
+        amount REAL NOT NULL,
+        type TEXT NOT NULL,
+        categoryId TEXT NOT NULL,
+        paymentMethod TEXT NOT NULL,
+        partyName TEXT,
+        frequency TEXT NOT NULL,
+        startDate TEXT NOT NULL,
+        nextDueDate TEXT NOT NULL,
+        lastExecutedDate TEXT,
+        isActive INTEGER NOT NULL,
+        notes TEXT
+      )
+    ''');
+
     // Indexes for high performance querying
     await db.execute('CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions(date)');
     await db.execute('CREATE INDEX IF NOT EXISTS idx_transactions_category ON transactions(categoryId)');
@@ -111,6 +131,27 @@ class DatabaseService {
         await db.execute('CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions(date)');
         await db.execute('CREATE INDEX IF NOT EXISTS idx_transactions_category ON transactions(categoryId)');
         await db.execute('CREATE INDEX IF NOT EXISTS idx_debts_owed ON debts(isOwedByMe)');
+      } catch (_) {}
+    }
+    if (oldVersion < 4) {
+      try {
+        await db.execute('''
+          CREATE TABLE IF NOT EXISTS recurring_transactions (
+            id TEXT PRIMARY KEY,
+            title TEXT NOT NULL,
+            amount REAL NOT NULL,
+            type TEXT NOT NULL,
+            categoryId TEXT NOT NULL,
+            paymentMethod TEXT NOT NULL,
+            partyName TEXT,
+            frequency TEXT NOT NULL,
+            startDate TEXT NOT NULL,
+            nextDueDate TEXT NOT NULL,
+            lastExecutedDate TEXT,
+            isActive INTEGER NOT NULL,
+            notes TEXT
+          )
+        ''');
       } catch (_) {}
     }
   }
@@ -192,5 +233,61 @@ class DatabaseService {
   Future<void> insertDebtPayment(DebtPaymentModel payment) async {
     final db = await database;
     await db.insert('debt_payments', payment.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  // --- RECURRING TRANSACTIONS ---
+  Future<List<RecurringTransactionModel>> getRecurringTransactions() async {
+    final db = await database;
+    final res = await db.query('recurring_transactions', orderBy: 'nextDueDate ASC');
+    return res.map((e) => RecurringTransactionModel.fromMap(e)).toList();
+  }
+
+  Future<void> insertRecurringTransaction(RecurringTransactionModel recurring) async {
+    final db = await database;
+    await db.insert('recurring_transactions', recurring.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<void> updateRecurringTransaction(RecurringTransactionModel recurring) async {
+    final db = await database;
+    await db.update('recurring_transactions', recurring.toMap(), where: 'id = ?', whereArgs: [recurring.id]);
+  }
+
+  Future<void> deleteRecurringTransaction(String id) async {
+    final db = await database;
+    await db.delete('recurring_transactions', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> processPendingRecurringTransactions() async {
+    final recurringList = await getRecurringTransactions();
+    final now = DateTime.now();
+    int executedCount = 0;
+
+    for (var r in recurringList) {
+      if (!r.isActive) continue;
+
+      if (r.nextDueDate.isBefore(now) || r.nextDueDate.isAtSameMomentAs(now)) {
+        final tx = TransactionModel(
+          id: '${DateTime.now().millisecondsSinceEpoch}_${r.id.length >= 4 ? r.id.substring(0, 4) : r.id}',
+          title: '${r.title} (Recurring)',
+          amount: r.amount,
+          type: r.type,
+          categoryId: r.categoryId,
+          paymentMethod: r.paymentMethod,
+          partyName: r.partyName,
+          date: r.nextDueDate,
+          notes: r.notes ?? 'Auto-generated recurring transaction',
+        );
+        await insertTransaction(tx);
+
+        final nextDate = r.calculateNextDate(r.nextDueDate);
+        final updated = r.copyWith(
+          lastExecutedDate: now,
+          nextDueDate: nextDate,
+        );
+        await updateRecurringTransaction(updated);
+        executedCount++;
+      }
+    }
+    return executedCount;
   }
 }

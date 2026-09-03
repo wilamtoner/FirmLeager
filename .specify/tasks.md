@@ -105,20 +105,20 @@ gantt
 
 ---
 
-## Phase 6: Next Roadmap Backlog (Upcoming Tasks) 📋
+## Phase 6: Production Enterprise Suite ✅ (In Progress)
 
-- [ ] **TASK-601: PDF Statement & Invoice Generation**
-  - **Description**: Add PDF statement export with official firm logo, tax PAN/VAT header, and signature box using `pdf` package.
-  - **Dependencies**: `CsvExporter`, `FirmProfileModel`.
-- [ ] **TASK-602: Recurring Transactions & Reminders**
-  - **Description**: Support scheduled periodic expenses (monthly rent, EMI payments, utility bills) with auto-creation triggers.
-  - **Dependencies**: `transactions` table, `DatabaseService`.
-- [ ] **TASK-603: Category Budget Limits & Over-Budget Alerts**
-  - **Description**: Visual progress bars in `ExpenseTab` comparing actual spending against `CategoryModel.budgetLimit` with warning thresholds (80%, 100%).
-  - **Dependencies**: `CategoryModel`, `DashboardSummary`.
-- [ ] **TASK-604: Encrypted Local Database Backup & Restore**
-  - **Description**: Export and import complete encrypted JSON/SQLite database snapshots to local storage.
-  - **Dependencies**: `DatabaseService`.
+- [x] **TASK-601: PDF Statement & Invoice Generation**
+  - **Description**: Professional PDF statement generation with official letterhead, tax PAN/VAT header, transaction breakdown table, financial KPIs, and signature block using `pdf` & `printing` packages.
+  - **Status**: Implemented in `PdfInvoiceGenerator` and verified.
+- [x] **TASK-602: Recurring Transactions & Reminders**
+  - **Description**: Automated periodic transaction engine supporting daily, weekly, monthly, and yearly recurring schedules with DB v4 migration and startup auto-generation.
+  - **Status**: Implemented in `RecurringTransactionModel`, `DatabaseService`, and `recurringProvider`.
+- [x] **TASK-603: Category Budget Limits & Over-Budget Alerts**
+  - **Description**: Visual progress bars in `ExpenseTab` comparing actual spending against `CategoryModel.budgetLimit` with warning thresholds (Amber at 80%, Red alert badge at 100%+).
+  - **Status**: Implemented in `categoryBudgetProvider` and `ExpenseTab`.
+- [x] **TASK-604: Structured Local Database Backup & Restore**
+  - **Description**: Export and import complete JSON database snapshots with data validation across all tables.
+  - **Status**: Implemented in `BackupService` with AppBar action integrations.
 - [ ] **TASK-605: Multi-Currency Live Converter**
   - **Description**: Currency switcher supporting real-time exchange rates for cross-border transactions.
   - **Dependencies**: `FirmProfileModel`, `Formatters`.

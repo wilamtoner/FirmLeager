@@ -9,6 +9,8 @@ import '../providers/transaction_provider.dart';
 import '../providers/firm_provider.dart';
 import '../providers/theme_provider.dart';
 import '../utils/csv_exporter.dart';
+import '../utils/pdf_invoice_generator.dart';
+import '../utils/backup_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -53,6 +55,42 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
+  Future<void> _exportPdf() async {
+    final transactions = ref.read(transactionProvider);
+    final firm = ref.read(firmProvider);
+    final dateRange = DateTimeRange(
+      start: DateTime.now().subtract(const Duration(days: 30)),
+      end: DateTime.now(),
+    );
+
+    await PdfInvoiceGenerator.exportAndPrintStatement(
+      context: context,
+      transactions: transactions,
+      firm: firm,
+      dateRange: dateRange,
+    );
+  }
+
+  Future<void> _backupData() async {
+    try {
+      final file = await BackupService.createBackupFile();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Full Backup Saved: ${file.path}'),
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Backup failed: $e')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeMode = ref.watch(themeModeProvider);
@@ -93,9 +131,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           // CSV Statement Export
           IconButton(
-            icon: const Icon(Icons.download_rounded, color: Colors.white),
+            icon: const Icon(Icons.table_chart_outlined, color: Colors.white),
             tooltip: 'Export CSV Statement',
             onPressed: _exportCsv,
+          ),
+          // PDF Statement Export
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf_outlined, color: Colors.white),
+            tooltip: 'Export PDF Statement',
+            onPressed: _exportPdf,
+          ),
+          // JSON Database Backup
+          IconButton(
+            icon: const Icon(Icons.backup_outlined, color: Colors.white),
+            tooltip: 'Backup Database (JSON)',
+            onPressed: _backupData,
           ),
           // Edit Firm Details Button
           Padding(

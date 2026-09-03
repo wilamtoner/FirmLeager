@@ -8,6 +8,7 @@ import '../providers/firm_provider.dart';
 import '../providers/transaction_provider.dart';
 import '../models/transaction.dart';
 import '../utils/csv_exporter.dart';
+import '../utils/pdf_invoice_generator.dart';
 import 'card_detail_dialog.dart';
 import 'edit_firm_dialog.dart';
 import 'new_transaction_screen.dart';
@@ -64,6 +65,19 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
         ),
       );
     }
+  }
+
+  Future<void> _exportPdf() async {
+    HapticFeedback.lightImpact();
+    final transactions = ref.read(transactionProvider);
+    final firm = ref.read(firmProvider);
+
+    await PdfInvoiceGenerator.exportAndPrintStatement(
+      context: context,
+      transactions: transactions,
+      firm: firm,
+      dateRange: _dateRange,
+    );
   }
 
   @override
@@ -223,10 +237,18 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
                 const SizedBox(width: 8),
                 _buildQuickActionButton(
                   context,
-                  label: '📥 Export',
+                  label: '📥 CSV',
                   color: Colors.indigo.shade700,
                   icon: Icons.download,
                   onTap: _exportCsv,
+                ),
+                const SizedBox(width: 8),
+                _buildQuickActionButton(
+                  context,
+                  label: '📄 PDF',
+                  color: Colors.teal.shade800,
+                  icon: Icons.picture_as_pdf,
+                  onTap: _exportPdf,
                 ),
               ],
             ),

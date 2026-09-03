@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/transaction_provider.dart';
 import '../providers/category_provider.dart';
 import '../providers/firm_provider.dart';
+import '../providers/dashboard_provider.dart';
 import '../models/transaction.dart';
 import '../models/category.dart';
 import '../utils/formatters.dart';
@@ -26,6 +27,7 @@ class _ExpenseTabState extends ConsumerState<ExpenseTab> {
     final transactions = ref.watch(transactionProvider);
     final categories = ref.watch(categoryProvider);
     final firm = ref.watch(firmProvider);
+    final budgetStatuses = ref.watch(categoryBudgetProvider);
 
     final filtered = transactions.where((t) {
       final matchesSearch = t.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
@@ -77,7 +79,78 @@ class _ExpenseTabState extends ConsumerState<ExpenseTab> {
               ],
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
+
+          // Monthly Category Budgets & Alerts
+          if (budgetStatuses.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+              child: Card(
+                elevation: 0,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF1E293B)
+                    : const Color(0xFFF1F5F9),
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(
+                    color: budgetStatuses.any((b) => b.isOverBudget)
+                        ? Colors.red.shade400
+                        : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF334155) : Colors.grey.shade300),
+                    width: budgetStatuses.any((b) => b.isOverBudget) ? 1.5 : 1,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Theme(
+                  data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                  child: ExpansionTile(
+                    initiallyExpanded: budgetStatuses.any((b) => b.isNearBudget || b.isOverBudget),
+                    tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                    leading: Icon(
+                      budgetStatuses.any((b) => b.isOverBudget)
+                          ? Icons.warning_amber_rounded
+                          : Icons.account_balance_wallet_outlined,
+                      size: 20,
+                      color: budgetStatuses.any((b) => b.isOverBudget) ? Colors.red : darkGreen,
+                    ),
+                    title: Row(
+                      children: [
+                        const Text(
+                          'Category Budgets',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                        const Spacer(),
+                        if (budgetStatuses.any((b) => b.isOverBudget))
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.red.shade100,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              '${budgetStatuses.where((b) => b.isOverBudget).length} Over Budget!',
+                              style: TextStyle(
+                                color: Colors.red.shade900,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+                        child: Column(
+                          children: budgetStatuses
+                              .map((b) => _buildBudgetProgressRow(b, firm.currencySymbol))
+                              .toList(),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          const SizedBox(height: 6),
 
           // Transaction List
           Expanded(
@@ -205,6 +278,68 @@ class _ExpenseTabState extends ConsumerState<ExpenseTab> {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(4)),
       child: Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+    );
+  }
+
+  Widget _buildBudgetProgressRow(CategoryBudgetStatus b, String symbol) {
+    Color progressColor;
+    if (b.isOverBudget) {
+      progressColor = Colors.red;
+    } else if (b.isNearBudget) {
+      progressColor = Colors.amber.shade700;
+    } else {
+      progressColor = darkGreen;
+    }
+
+    final double clampedProgress = (b.percentage / 100.0).clamp(0.0, 1.0);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: Color(b.category.colorHex),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    b.category.name,
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+              Text(
+                '$symbol${b.spentAmount.toStringAsFixed(0)} / $symbol${b.budgetLimit.toStringAsFixed(0)} (${b.percentage.toStringAsFixed(0)}%)',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: b.isOverBudget ? Colors.red : null,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: clampedProgress,
+              minHeight: 6,
+              backgroundColor: Colors.grey.shade300,
+              valueColor: AlwaysStoppedAnimation<Color>(progressColor),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

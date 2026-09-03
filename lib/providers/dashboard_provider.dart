@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/transaction.dart';
+import '../models/category.dart';
 import 'transaction_provider.dart';
 import 'debt_provider.dart';
+import 'category_provider.dart';
 
 class DashboardSummary {
   final double totalIncome;
@@ -66,4 +68,59 @@ final dashboardProvider = Provider<DashboardSummary>((ref) {
     debtToIncomeRatio: dtiRatio,
     categoryExpenses: categoryExpenses,
   );
+});
+
+class CategoryBudgetStatus {
+  final CategoryModel category;
+  final double spentAmount;
+  final double budgetLimit;
+  final double percentage;
+  final bool isOverBudget;
+  final bool isNearBudget;
+
+  CategoryBudgetStatus({
+    required this.category,
+    required this.spentAmount,
+    required this.budgetLimit,
+    required this.percentage,
+    required this.isOverBudget,
+    required this.isNearBudget,
+  });
+}
+
+final categoryBudgetProvider = Provider<List<CategoryBudgetStatus>>((ref) {
+  final transactions = ref.watch(transactionProvider);
+  final categories = ref.watch(categoryProvider);
+
+  final now = DateTime.now();
+  final currentMonthStart = DateTime(now.year, now.month, 1);
+  final currentMonthEnd = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
+
+  final monthExpenses = transactions.where((t) =>
+      t.type == TransactionType.expense &&
+      (t.date.isAfter(currentMonthStart) || t.date.isAtSameMomentAs(currentMonthStart)) &&
+      (t.date.isBefore(currentMonthEnd) || t.date.isAtSameMomentAs(currentMonthEnd)));
+
+  Map<String, double> spentByCategory = {};
+  for (var t in monthExpenses) {
+    spentByCategory[t.categoryId] = (spentByCategory[t.categoryId] ?? 0.0) + t.amount;
+  }
+
+  final List<CategoryBudgetStatus> list = [];
+  for (var c in categories) {
+    if (c.budgetLimit > 0) {
+      final spent = spentByCategory[c.id] ?? 0.0;
+      final pct = (spent / c.budgetLimit) * 100.0;
+      list.add(CategoryBudgetStatus(
+        category: c,
+        spentAmount: spent,
+        budgetLimit: c.budgetLimit,
+        percentage: pct,
+        isOverBudget: spent > c.budgetLimit,
+        isNearBudget: spent >= (c.budgetLimit * 0.8),
+      ));
+    }
+  }
+
+  return list;
 });
