@@ -35,12 +35,14 @@ gantt
     IndexedStack Tab Preservation           :done, p4_4, 2026-09-03, 2026-09-03
     section Phase 5: Export & QA
     Date-Bounded CSV Export                 :done, p5_1, 2026-09-03, 2026-09-03
-    Automated Unit & Smoke Suite (16/16)    :done, p5_2, 2026-09-03, 2026-09-03
-    section Phase 6: Roadmap
-    PDF Invoices & Receipts                 :active, p6_1, 2026-09-04, 3d
-    Recurring Transactions & Reminders      :p6_2, after p6_1, 3d
-    Budget Limit Threshold Alerts           :p6_3, after p6_2, 2d
-    Encrypted Backup & Restore              :p6_4, after p6_3, 2d
+    Automated Unit & Smoke Suite (21/21)    :done, p5_2, 2026-09-03, 2026-09-03
+    section Phase 6: Production Enterprise Suite
+    PDF Invoices & Receipts                 :done, p6_1, 2026-09-03, 2026-09-03
+    Recurring Transactions & Reminders      :done, p6_2, 2026-09-03, 2026-09-03
+    Budget Limit Threshold Alerts           :done, p6_3, 2026-09-03, 2026-09-03
+    Structured Backup & Restore             :done, p6_4, 2026-09-03, 2026-09-03
+    Debt Currency Synchronization           :done, p6_5, 2026-09-03, 2026-09-03
+    Multi-Currency Live Converter           :active, p6_6, 2026-09-04, 2d
 ```
 
 ---
@@ -97,11 +99,14 @@ gantt
 - [x] **TASK-502**: Enforce strict date-range boundary filtering in CSV exports.
 - [x] **TASK-503**: Write comprehensive automated unit tests:
   - `test/models_test.dart`: Serialization, copyWith, fallbacks (8 tests).
-  - `test/debt_calculator_test.dart`: Snowball vs Avalanche logic (4 tests).
+  - `test/debt_calculator_test.dart`: Snowball vs Avalanche logic (5 tests).
   - `test/csv_exporter_test.dart`: Date-filtered export verification (1 test).
-  - `test/formatters_test.dart`: Currency and date formatting (2 tests).
+  - `test/formatters_test.dart`: Currency and date formatting (3 tests).
+  - `test/backup_service_test.dart`: Serialization & date rollover edge cases (3 tests).
+  - `test/budget_calculation_test.dart`: Over-budget threshold verification (1 test).
   - `test/widget_test.dart`: Application smoke test with FFI bootstrap (1 test).
 - [x] **TASK-504**: Verify static analysis cleanliness with `flutter analyze` (0 issues).
+- [x] **TASK-505**: Implement Test-First invariant coverage for custom currency symbols, leap-year rollovers, and zero-interest loans (21/21 passing).
 
 ---
 
@@ -119,6 +124,9 @@ gantt
 - [x] **TASK-604: Structured Local Database Backup & Restore**
   - **Description**: Export and import complete JSON database snapshots with data validation across all tables.
   - **Status**: Implemented in `BackupService` with AppBar action integrations.
+- [x] **TASK-606: Debt Module Currency Synchronization**
+  - **Description**: Dynamically synchronize the Debt Payoff Strategy Calculator, Debt Ledger Tab, and Add Debt dialog with the configured firm currency symbol.
+  - **Status**: Implemented in `DebtPayoffScreen`, `DebtTab`, and `AddDebtDialog`.
 - [ ] **TASK-605: Multi-Currency Live Converter**
   - **Description**: Currency switcher supporting real-time exchange rates for cross-border transactions.
   - **Dependencies**: `FirmProfileModel`, `Formatters`.
