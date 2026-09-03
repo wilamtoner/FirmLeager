@@ -10,6 +10,7 @@ import '../models/transaction.dart';
 import '../utils/csv_exporter.dart';
 import '../utils/pdf_invoice_generator.dart';
 import 'card_detail_dialog.dart';
+import 'currency_converter_dialog.dart';
 import 'edit_firm_dialog.dart';
 import 'new_transaction_screen.dart';
 
@@ -249,6 +250,19 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
                   color: Colors.teal.shade800,
                   icon: Icons.picture_as_pdf,
                   onTap: _exportPdf,
+                ),
+                const SizedBox(width: 8),
+                _buildQuickActionButton(
+                  context,
+                  label: '💱 Convert',
+                  color: Colors.blueGrey.shade800,
+                  icon: Icons.currency_exchange,
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => const CurrencyConverterDialog(),
+                    );
+                  },
                 ),
               ],
             ),

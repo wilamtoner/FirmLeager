@@ -35,14 +35,14 @@ gantt
     IndexedStack Tab Preservation           :done, p4_4, 2026-09-03, 2026-09-03
     section Phase 5: Export & QA
     Date-Bounded CSV Export                 :done, p5_1, 2026-09-03, 2026-09-03
-    Automated Unit & Smoke Suite (21/21)    :done, p5_2, 2026-09-03, 2026-09-03
+    Automated Unit & Smoke Suite (28/28)    :done, p5_2, 2026-09-03, 2026-09-03
     section Phase 6: Production Enterprise Suite
     PDF Invoices & Receipts                 :done, p6_1, 2026-09-03, 2026-09-03
     Recurring Transactions & Reminders      :done, p6_2, 2026-09-03, 2026-09-03
     Budget Limit Threshold Alerts           :done, p6_3, 2026-09-03, 2026-09-03
     Structured Backup & Restore             :done, p6_4, 2026-09-03, 2026-09-03
     Debt Currency Synchronization           :done, p6_5, 2026-09-03, 2026-09-03
-    Multi-Currency Live Converter           :active, p6_6, 2026-09-04, 2d
+    Multi-Currency Live Converter           :done, p6_6, 2026-09-03, 2026-09-03
 ```
 
 ---
@@ -127,6 +127,6 @@ gantt
 - [x] **TASK-606: Debt Module Currency Synchronization**
   - **Description**: Dynamically synchronize the Debt Payoff Strategy Calculator, Debt Ledger Tab, and Add Debt dialog with the configured firm currency symbol.
   - **Status**: Implemented in `DebtPayoffScreen`, `DebtTab`, and `AddDebtDialog`.
-- [ ] **TASK-605: Multi-Currency Live Converter**
-  - **Description**: Currency switcher supporting real-time exchange rates for cross-border transactions.
-  - **Dependencies**: `FirmProfileModel`, `Formatters`.
+- [x] **TASK-605: Real-Time Multi-Currency Live Converter**
+  - **Description**: Real-time foreign exchange converter fetching live rates from open.er-api.com with offline caching, cross-currency triangulation, and quick-swap modal UI.
+  - **Status**: Implemented in `CurrencyService`, `currencyProvider`, `CurrencyConverterDialog`, and integrated into `DashboardTab`. Tested with 7 dedicated unit tests.
