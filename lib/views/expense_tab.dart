@@ -258,22 +258,11 @@ class _ExpenseTabState extends ConsumerState<ExpenseTab> {
   }
 
   Widget _buildMethodBadge(PaymentMethod method) {
-    Color bg;
-    String label;
-    switch (method) {
-      case PaymentMethod.bank:
-        bg = Colors.blue.shade100;
-        label = 'Bank';
-        break;
-      case PaymentMethod.cash:
-        bg = Colors.green.shade100;
-        label = 'Cash';
-        break;
-      case PaymentMethod.credit:
-        bg = Colors.amber.shade100;
-        label = 'Credit';
-        break;
-    }
+    final (bg, label) = switch (method) {
+      PaymentMethod.bank => (Colors.blue.shade100, 'Bank'),
+      PaymentMethod.cash => (Colors.green.shade100, 'Cash'),
+      PaymentMethod.credit => (Colors.amber.shade100, 'Credit'),
+    };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(4)),

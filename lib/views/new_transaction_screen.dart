@@ -128,10 +128,34 @@ class _NewTransactionScreenState extends ConsumerState<NewTransactionScreen> {
   Widget build(BuildContext context) {
     final isIncome = (_transactionType == TransactionType.income);
     final dateFormat = DateFormat('yyyy-MM-dd');
+    final hasInput = _titleController.text.trim().isNotEmpty || _amountController.text.trim().isNotEmpty;
 
-    return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: Scaffold(
+    return PopScope(
+      canPop: !hasInput,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        final navigator = Navigator.of(context);
+        final shouldPop = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Discard Entry?'),
+            content: const Text('You have unsaved details that will be lost.'),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Keep Editing')),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: const Text('Discard', style: TextStyle(color: Colors.red)),
+              ),
+            ],
+          ),
+        );
+        if (shouldPop == true) {
+          navigator.pop(result);
+        }
+      },
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
           title: Text(
@@ -383,6 +407,7 @@ class _NewTransactionScreenState extends ConsumerState<NewTransactionScreen> {
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 }

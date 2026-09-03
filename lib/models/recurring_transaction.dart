@@ -109,24 +109,24 @@ class RecurringTransactionModel {
   }
 
   DateTime calculateNextDate(DateTime fromDate) {
-    switch (frequency) {
-      case RecurringFrequency.daily:
-        return fromDate.add(const Duration(days: 1));
-      case RecurringFrequency.weekly:
-        return fromDate.add(const Duration(days: 7));
-      case RecurringFrequency.monthly:
-        int newYear = fromDate.year;
-        int newMonth = fromDate.month + 1;
-        if (newMonth > 12) {
-          newYear += 1;
-          newMonth = 1;
-        }
-        int newDay = fromDate.day;
-        final daysInMonth = DateTime(newYear, newMonth + 1, 0).day;
-        if (newDay > daysInMonth) newDay = daysInMonth;
-        return DateTime(newYear, newMonth, newDay, fromDate.hour, fromDate.minute);
-      case RecurringFrequency.yearly:
-        return DateTime(fromDate.year + 1, fromDate.month, fromDate.day, fromDate.hour, fromDate.minute);
+    return switch (frequency) {
+      RecurringFrequency.daily => fromDate.add(const Duration(days: 1)),
+      RecurringFrequency.weekly => fromDate.add(const Duration(days: 7)),
+      RecurringFrequency.monthly => _calculateNextMonth(fromDate),
+      RecurringFrequency.yearly => DateTime(fromDate.year + 1, fromDate.month, fromDate.day, fromDate.hour, fromDate.minute),
+    };
+  }
+
+  DateTime _calculateNextMonth(DateTime fromDate) {
+    int newYear = fromDate.year;
+    int newMonth = fromDate.month + 1;
+    if (newMonth > 12) {
+      newYear += 1;
+      newMonth = 1;
     }
+    int newDay = fromDate.day;
+    final daysInMonth = DateTime(newYear, newMonth + 1, 0).day;
+    if (newDay > daysInMonth) newDay = daysInMonth;
+    return DateTime(newYear, newMonth, newDay, fromDate.hour, fromDate.minute);
   }
 }
