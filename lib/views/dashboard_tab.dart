@@ -203,7 +203,6 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
                     context,
                     label: 'Income',
                     color: Colors.green.shade700,
-                    icon: Icons.add,
                     onTap: () {
                       HapticFeedback.lightImpact();
                       Navigator.of(context).push(
@@ -216,7 +215,6 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
                     context,
                     label: 'Expense',
                     color: Colors.red.shade700,
-                    icon: Icons.remove,
                     onTap: () {
                       HapticFeedback.lightImpact();
                       Navigator.of(context).push(
@@ -229,7 +227,6 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
                     context,
                     label: 'Credit',
                     color: Colors.amber.shade800,
-                    icon: Icons.credit_card_outlined,
                     onTap: () {
                       HapticFeedback.lightImpact();
                       Navigator.of(context).push(
@@ -242,7 +239,6 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
                     context,
                     label: 'CSV',
                     color: Colors.indigo.shade700,
-                    icon: Icons.table_chart_outlined,
                     onTap: _exportCsv,
                   ),
                   const SizedBox(width: 8),
@@ -250,7 +246,6 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
                     context,
                     label: 'PDF',
                     color: Colors.teal.shade800,
-                    icon: Icons.picture_as_pdf_outlined,
                     onTap: _exportPdf,
                   ),
                   const SizedBox(width: 8),
@@ -258,7 +253,6 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
                     context,
                     label: 'Convert',
                     color: Colors.blueGrey.shade800,
-                    icon: Icons.currency_exchange,
                     onTap: () {
                       HapticFeedback.lightImpact();
                       Navigator.of(context).push(
@@ -414,7 +408,6 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
     BuildContext context, {
     required String label,
     required Color color,
-    required IconData icon,
     required VoidCallback onTap,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -424,7 +417,7 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
         onTap: onTap,
         borderRadius: BorderRadius.circular(10),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
           decoration: BoxDecoration(
             color: isDark ? const Color(0xFF1E293B) : Colors.white,
             borderRadius: BorderRadius.circular(10),
@@ -433,20 +426,13 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
               width: 1,
             ),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, color: color, size: 16),
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : Colors.black87,
-                ),
-              ),
-            ],
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: isDark ? Colors.white : Colors.black87,
+            ),
           ),
         ),
       ),

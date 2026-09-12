@@ -186,46 +186,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     break;
                 }
               },
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               itemBuilder: (ctx) => const [
                 PopupMenuItem(
                   value: 'edit',
-                  child: Row(
-                    children: [
-                      Icon(Icons.edit, size: 18),
-                      SizedBox(width: 8),
-                      Text('Edit Firm Info'),
-                    ],
-                  ),
+                  child: Text('Edit Firm Info'),
                 ),
                 PopupMenuItem(
                   value: 'pdf',
-                  child: Row(
-                    children: [
-                      Icon(Icons.picture_as_pdf, size: 18),
-                      SizedBox(width: 8),
-                      Text('Export PDF Statement'),
-                    ],
-                  ),
+                  child: Text('Export PDF Statement'),
                 ),
                 PopupMenuItem(
                   value: 'csv',
-                  child: Row(
-                    children: [
-                      Icon(Icons.table_chart, size: 18),
-                      SizedBox(width: 8),
-                      Text('Export CSV File'),
-                    ],
-                  ),
+                  child: Text('Export CSV File'),
                 ),
                 PopupMenuItem(
                   value: 'backup',
-                  child: Row(
-                    children: [
-                      Icon(Icons.backup, size: 18),
-                      SizedBox(width: 8),
-                      Text('Backup Database'),
-                    ],
-                  ),
+                  child: Text('Backup Database'),
                 ),
               ],
             ),
