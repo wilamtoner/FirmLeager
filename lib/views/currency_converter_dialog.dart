@@ -52,7 +52,7 @@ class _CurrencyConverterDialogState extends ConsumerState<CurrencyConverterDialo
               // Header
               Row(
                 children: [
-                  const Text('💱', style: TextStyle(fontSize: 22)),
+                  const Icon(Icons.currency_exchange, size: 20, color: Color(0xFF064E3B)),
                   const SizedBox(width: 8),
                   const Expanded(
                     child: Text(

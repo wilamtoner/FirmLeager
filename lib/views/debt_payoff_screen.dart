@@ -76,7 +76,7 @@ class _DebtPayoffScreenState extends ConsumerState<DebtPayoffScreen> {
                 Expanded(
                   child: _buildStrategyCard(
                     context,
-                    title: 'Debt Snowball ❄️',
+                    title: 'Debt Snowball',
                     subtitle: 'Lowest Balance First',
                     result: snowball,
                     color: Colors.blue,
@@ -87,7 +87,7 @@ class _DebtPayoffScreenState extends ConsumerState<DebtPayoffScreen> {
                 Expanded(
                   child: _buildStrategyCard(
                     context,
-                    title: 'Debt Avalanche 🏔️',
+                    title: 'Debt Avalanche',
                     subtitle: 'Highest APR First',
                     result: avalanche,
                     color: Colors.deepOrange,
@@ -103,7 +103,7 @@ class _DebtPayoffScreenState extends ConsumerState<DebtPayoffScreen> {
                 ? const Card(
                     child: Padding(
                       padding: EdgeInsets.all(16.0),
-                      child: Text('No active debts owed! You are debt-free 🎉'),
+                      child: Text('No active debts owed. You are debt-free!'),
                     ),
                   )
                 : ListView.builder(

@@ -194,16 +194,16 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
             ),
             const SizedBox(height: 16),
 
-            // 2. Mobile Quick Action Bar
+            // 2. Quick Actions Bar
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
                   _buildQuickActionButton(
                     context,
-                    label: '+ Income',
+                    label: 'Income',
                     color: Colors.green.shade700,
-                    icon: Icons.add_circle_outline,
+                    icon: Icons.add,
                     onTap: () {
                       HapticFeedback.lightImpact();
                       Navigator.of(context).push(
@@ -214,9 +214,9 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
                   const SizedBox(width: 8),
                   _buildQuickActionButton(
                     context,
-                    label: '- Expense',
+                    label: 'Expense',
                     color: Colors.red.shade700,
-                    icon: Icons.remove_circle_outline,
+                    icon: Icons.remove,
                     onTap: () {
                       HapticFeedback.lightImpact();
                       Navigator.of(context).push(
@@ -227,9 +227,9 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
                   const SizedBox(width: 8),
                   _buildQuickActionButton(
                     context,
-                    label: '+ Credit',
+                    label: 'Credit',
                     color: Colors.amber.shade800,
-                    icon: Icons.credit_score,
+                    icon: Icons.credit_card_outlined,
                     onTap: () {
                       HapticFeedback.lightImpact();
                       Navigator.of(context).push(
@@ -240,23 +240,23 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
                   const SizedBox(width: 8),
                   _buildQuickActionButton(
                     context,
-                    label: '📥 CSV',
+                    label: 'CSV',
                     color: Colors.indigo.shade700,
-                    icon: Icons.download,
+                    icon: Icons.table_chart_outlined,
                     onTap: _exportCsv,
                   ),
                   const SizedBox(width: 8),
                   _buildQuickActionButton(
                     context,
-                    label: '📄 PDF',
+                    label: 'PDF',
                     color: Colors.teal.shade800,
-                    icon: Icons.picture_as_pdf,
+                    icon: Icons.picture_as_pdf_outlined,
                     onTap: _exportPdf,
                   ),
                   const SizedBox(width: 8),
                   _buildQuickActionButton(
                     context,
-                    label: '💱 Convert',
+                    label: 'Convert',
                     color: Colors.blueGrey.shade800,
                     icon: Icons.currency_exchange,
                     onTap: () {
@@ -315,8 +315,8 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
                 _buildStatCard(
                   context,
                   title: 'Income',
+                  subtitle: 'Period Total',
                   value: '$symbol ${totalIncome.toStringAsFixed(0)}',
-                  icon: Icons.account_balance,
                   badgeColor: Colors.green.shade800,
                   onDetailTap: () => _openDetail(DetailCardType.income),
                 ),
@@ -325,8 +325,8 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
                 _buildStatCard(
                   context,
                   title: 'Expense',
+                  subtitle: 'Period Total',
                   value: '$symbol ${totalExpenses.toStringAsFixed(0)}',
-                  icon: Icons.account_balance_outlined,
                   badgeColor: Colors.orange.shade800,
                   onDetailTap: () => _openDetail(DetailCardType.expense),
                 ),
@@ -335,9 +335,8 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
                 _buildStatCard(
                   context,
                   title: 'Receivables',
-                  subtitle: 'Money To Collect',
-                  value: '$symbol ${totalDebtsOwedToMe.toStringAsFixed(0)} / $debtsOwedToMeCount',
-                  icon: Icons.add_box_rounded,
+                  subtitle: '$debtsOwedToMeCount to collect',
+                  value: '$symbol ${totalDebtsOwedToMe.toStringAsFixed(0)}',
                   badgeColor: darkGreen,
                   onDetailTap: () => _openDetail(DetailCardType.receivables),
                 ),
@@ -346,9 +345,8 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
                 _buildStatCard(
                   context,
                   title: 'Payables',
-                  subtitle: 'Money Due',
-                  value: '$symbol ${totalDebtsOwed.toStringAsFixed(0)} / $debtsIOweCount',
-                  icon: Icons.indeterminate_check_box_rounded,
+                  subtitle: '$debtsIOweCount due',
+                  value: '$symbol ${totalDebtsOwed.toStringAsFixed(0)}',
                   badgeColor: Colors.red.shade800,
                   onDetailTap: () => _openDetail(DetailCardType.payables),
                 ),
@@ -419,26 +417,37 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
     required IconData icon,
     required VoidCallback onTap,
   }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: color, size: 18),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: color),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: isDark ? const Color(0xFF334155) : Colors.grey.shade300,
+              width: 1,
             ),
-          ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: color, size: 16),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -449,78 +458,75 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
     required String title,
     String? subtitle,
     required String value,
-    required IconData icon,
     required Color badgeColor,
     required VoidCallback onDetailTap,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF0FDF4),
-        border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFDCFCE7), width: 1.5),
+    return Material(
+      color: isDark ? const Color(0xFF1E293B) : Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: onDetailTap,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          )
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: isDark ? const Color(0xFF334155) : Colors.grey.shade200,
+              width: 1.2,
+            ),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: badgeColor,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(icon, color: Colors.white, size: 18),
-              ),
-              InkWell(
-                onTap: onDetailTap,
-                child: Text(
-                  'Detail',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.underline,
-                    color: isDark ? Colors.grey.shade400 : Colors.grey.shade700,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    title.toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.6,
+                      color: badgeColor,
+                    ),
                   ),
-                ),
-              )
+                  Icon(
+                    Icons.chevron_right,
+                    size: 16,
+                    color: isDark ? Colors.grey.shade500 : Colors.grey.shade400,
+                  ),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
             ],
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.grey.shade300 : Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                  color: isDark ? Colors.white : Colors.black,
-                ),
-              ),
-            ],
-          )
-        ],
+        ),
       ),
     );
   }

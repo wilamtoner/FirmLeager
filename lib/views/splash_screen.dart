@@ -26,17 +26,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   Timer? _timer;
 
   double _progress = 0.0;
-  String _statusMessage = '🔐 Initializing secure offline vault...';
-
-  // Ambient floating background symbols
-  final List<_FloatingSymbol> _ambientSymbols = const [
-    _FloatingSymbol(symbol: '₹', x: 0.15, y: 0.22, size: 28, delay: 0.0),
-    _FloatingSymbol(symbol: '\$', x: 0.82, y: 0.18, size: 24, delay: 0.3),
-    _FloatingSymbol(symbol: '€', x: 0.12, y: 0.72, size: 26, delay: 0.6),
-    _FloatingSymbol(symbol: '£', x: 0.85, y: 0.68, size: 22, delay: 0.2),
-    _FloatingSymbol(symbol: '¥', x: 0.78, y: 0.42, size: 20, delay: 0.5),
-    _FloatingSymbol(symbol: '📈', x: 0.22, y: 0.45, size: 20, delay: 0.8),
-  ];
+  String _statusMessage = 'Initializing secure vault...';
 
   @override
   void initState() {
@@ -94,13 +84,13 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
       setState(() {
         _progress = newProgress;
         if (_progress < 0.30) {
-          _statusMessage = '🔐 Initializing secure offline vault...';
+          _statusMessage = 'Initializing secure vault...';
         } else if (_progress < 0.60) {
-          _statusMessage = '📊 Loading ledger accounts & category budgets...';
+          _statusMessage = 'Loading accounts & budgets...';
         } else if (_progress < 0.88) {
-          _statusMessage = '💱 Syncing live market rates & debt engine...';
+          _statusMessage = 'Syncing market rates & debt engine...';
         } else {
-          _statusMessage = '🚀 Ready! Welcome to FirmLedger...';
+          _statusMessage = 'Ready';
         }
       });
 
@@ -173,31 +163,6 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
             },
           ),
 
-          // B. Ambient Drifting Financial Symbols
-          ..._ambientSymbols.map((item) {
-            return AnimatedBuilder(
-              animation: _pulseController,
-              builder: (context, child) {
-                final offset = math.sin((_pulseController.value + item.delay) * 2 * math.pi) * 8;
-                return Positioned(
-                  left: MediaQuery.of(context).size.width * item.x,
-                  top: (MediaQuery.of(context).size.height * item.y) + offset,
-                  child: Opacity(
-                    opacity: 0.13 + (math.sin((_pulseController.value + item.delay) * math.pi) * 0.06),
-                    child: Text(
-                      item.symbol,
-                      style: TextStyle(
-                        fontSize: item.size,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            );
-          }),
-
           // C. Center Content (Logo, Glow, Title, Status & Progress)
           SafeArea(
             child: Column(
@@ -205,7 +170,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
               children: [
                 const Spacer(flex: 3),
 
-                // 1. 3D Logo with Dynamic Orbital Halo & Floating Levitation
+                // 1. 3D Logo with Floating Levitation
                 AnimatedBuilder(
                   animation: _pulseController,
                   builder: (context, child) {
@@ -232,22 +197,6 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                                     Colors.transparent,
                                   ],
                                   stops: const [0.2, 0.65, 1.0],
-                                ),
-                              ),
-                            ),
-
-                            // Rotating Ambient Ring
-                            Transform.rotate(
-                              angle: _pulseController.value * 2 * math.pi,
-                              child: Container(
-                                width: 156,
-                                height: 156,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: mintAccent.withValues(alpha: 0.25),
-                                    width: 1.5,
-                                  ),
                                 ),
                               ),
                             ),
@@ -329,21 +278,14 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                             width: 1,
                           ),
                         ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.shield_outlined, size: 14, color: brightMint),
-                            SizedBox(width: 6),
-                            Text(
-                              'Small Business Accounting & Debt Engine',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.white70,
-                                fontWeight: FontWeight.w500,
-                                letterSpacing: 0.4,
-                              ),
-                            ),
-                          ],
+                        child: const Text(
+                          'Small Business Accounting & Debt Engine',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.white70,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.4,
+                          ),
                         ),
                       ),
                     ],
@@ -462,20 +404,4 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
       ),
     );
   }
-}
-
-class _FloatingSymbol {
-  final String symbol;
-  final double x;
-  final double y;
-  final double size;
-  final double delay;
-
-  const _FloatingSymbol({
-    required this.symbol,
-    required this.x,
-    required this.y,
-    required this.size,
-    required this.delay,
-  });
 }

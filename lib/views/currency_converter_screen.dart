@@ -64,15 +64,9 @@ class _CurrencyConverterScreenState extends ConsumerState<CurrencyConverterScree
 
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
-          children: [
-            Text('💱', style: TextStyle(fontSize: 22)),
-            SizedBox(width: 8),
-            Text(
-              'Live Currency Converter',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-          ],
+        title: const Text(
+          'Live Currency Converter',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         backgroundColor: darkGreen,
         foregroundColor: Colors.white,
