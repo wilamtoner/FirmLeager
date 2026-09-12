@@ -15,6 +15,13 @@ void main() {
       expect(Formatters.currency(750, '₹'), '₹750.00');
       expect(Formatters.currency(1000, '£'), '£1,000.00');
       expect(Formatters.currency(0, 'Rs'), 'Rs0.00');
+      expect(Formatters.currency(15173.08, ''), '15,173.08');
+    });
+
+    test('number formats numbers with thousand separators and 2 decimal places', () {
+      expect(Formatters.number(15173.08), '15,173.08');
+      expect(Formatters.number(0), '0.00');
+      expect(Formatters.number(1234567.89), '1,234,567.89');
     });
 
     test('date formats DateTime in MMM dd, yyyy format', () {

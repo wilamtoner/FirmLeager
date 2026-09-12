@@ -115,7 +115,15 @@ class _DebtPayoffScreenState extends ConsumerState<DebtPayoffScreen> {
                       return Card(
                         child: ListTile(
                           title: Text(d.title),
-                          subtitle: Text('APR: ${d.apr.toStringAsFixed(1)}% | Min: ${Formatters.currency(d.minMonthlyPayment, symbol)}/mo'),
+                          subtitle: Text(
+                            d.apr == 0 && d.minMonthlyPayment == 0
+                                ? '0% Interest | Flexible Payoff'
+                                : d.apr == 0
+                                    ? '0% Interest | Min: ${Formatters.currency(d.minMonthlyPayment, symbol)}/mo'
+                                    : d.minMonthlyPayment == 0
+                                        ? 'APR: ${d.apr.toStringAsFixed(1)}% | Flexible Payoff'
+                                        : 'APR: ${d.apr.toStringAsFixed(1)}% | Min: ${Formatters.currency(d.minMonthlyPayment, symbol)}/mo',
+                          ),
                           trailing: Text(Formatters.currency(d.currentBalance, symbol),
                               style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.redAccent)),
                         ),

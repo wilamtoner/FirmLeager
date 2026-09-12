@@ -20,6 +20,8 @@ class _AddDebtDialogState extends ConsumerState<AddDebtDialog> {
   final _aprController = TextEditingController(text: '18.5');
   final _minPaymentController = TextEditingController(text: '35.0');
   bool _isOwedByMe = true;
+  bool _noInterest = false;
+  bool _noMonthlyPayment = false;
 
   @override
   void dispose() {
@@ -34,8 +36,8 @@ class _AddDebtDialogState extends ConsumerState<AddDebtDialog> {
   void _submit() {
     if (_formKey.currentState!.validate()) {
       final amount = double.parse(_amountController.text);
-      final apr = double.parse(_aprController.text);
-      final minPayment = double.parse(_minPaymentController.text);
+      final apr = _noInterest ? 0.0 : (double.tryParse(_aprController.text) ?? 0.0);
+      final minPayment = _noMonthlyPayment ? 0.0 : (double.tryParse(_minPaymentController.text) ?? 0.0);
 
       final debt = DebtModel(
         id: const Uuid().v4(),
@@ -66,6 +68,7 @@ class _AddDebtDialogState extends ConsumerState<AddDebtDialog> {
           key: _formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SegmentedButton<bool>(
                 segments: const [
@@ -73,18 +76,32 @@ class _AddDebtDialogState extends ConsumerState<AddDebtDialog> {
                   ButtonSegment(value: false, label: Text('Owed to Me (Asset)')),
                 ],
                 selected: {_isOwedByMe},
-                onSelectionChanged: (val) => setState(() => _isOwedByMe = val.first),
+                onSelectionChanged: (val) {
+                  setState(() {
+                    _isOwedByMe = val.first;
+                    // Auto-suggest 0% interest and flexible payment for money lent out
+                    if (!_isOwedByMe) {
+                      _noInterest = true;
+                      _noMonthlyPayment = true;
+                      _aprController.text = '0.0';
+                      _minPaymentController.text = '0.0';
+                    }
+                  });
+                },
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _titleController,
-                decoration: const InputDecoration(labelText: 'Debt Name (e.g., Credit Card)', border: OutlineInputBorder()),
+                decoration: const InputDecoration(labelText: 'Debt Name (e.g., Credit Card, Friend Loan)', border: OutlineInputBorder()),
                 validator: (val) => val == null || val.trim().isEmpty ? 'Enter name' : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _partyController,
-                decoration: const InputDecoration(labelText: 'Lender / Institution Name', border: OutlineInputBorder()),
+                decoration: InputDecoration(
+                  labelText: _isOwedByMe ? 'Lender / Institution Name' : 'Borrower Name',
+                  border: const OutlineInputBorder(),
+                ),
                 validator: (val) => val == null || val.trim().isEmpty ? 'Enter party name' : null,
               ),
               const SizedBox(height: 12),
@@ -97,26 +114,119 @@ class _AddDebtDialogState extends ConsumerState<AddDebtDialog> {
                   return p == null || p <= 0 ? 'Enter balance greater than 0' : null;
                 },
               ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _aprController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(labelText: 'Interest Rate (APR %)', border: OutlineInputBorder()),
-                validator: (val) {
-                  final p = val == null ? null : double.tryParse(val);
-                  return p == null || p < 0 ? 'Enter valid APR (0 or higher)' : null;
+              const SizedBox(height: 16),
+              const Divider(),
+              const SizedBox(height: 4),
+
+              // 1. No Interest (0% APR) Toggle
+              SwitchListTile.adaptive(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('No Interest (0% APR)', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                subtitle: const Text('Interest-free loan without any finance charges', style: TextStyle(fontSize: 12)),
+                value: _noInterest,
+                activeThumbColor: const Color(0xFF064E3B),
+                onChanged: (val) {
+                  setState(() {
+                    _noInterest = val;
+                    if (val) {
+                      _aprController.text = '0.0';
+                    } else if (_aprController.text == '0.0' || _aprController.text == '0') {
+                      _aprController.text = '18.5';
+                    }
+                  });
                 },
               ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _minPaymentController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: InputDecoration(labelText: 'Min Monthly Payment ($symbol)', border: const OutlineInputBorder()),
-                validator: (val) {
-                  final p = val == null ? null : double.tryParse(val);
-                  return p == null || p < 0 ? 'Enter min payment (0 or higher)' : null;
+              if (_noInterest)
+                Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.green.shade300),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.check_circle_outline, color: Colors.green, size: 18),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '0% APR — Interest-free debt',
+                          style: TextStyle(color: Colors.green, fontWeight: FontWeight.w600, fontSize: 12),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: TextFormField(
+                    controller: _aprController,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    decoration: const InputDecoration(labelText: 'Interest Rate (APR %)', border: OutlineInputBorder()),
+                    validator: (val) {
+                      if (_noInterest) return null;
+                      final p = val == null ? null : double.tryParse(val);
+                      return p == null || p < 0 ? 'Enter valid APR (0 or higher)' : null;
+                    },
+                  ),
+                ),
+
+              // 2. No Monthly Payment Option
+              SwitchListTile.adaptive(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('No Monthly Payment', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                subtitle: const Text('Flexible payoff — pay anytime or lump-sum', style: TextStyle(fontSize: 12)),
+                value: _noMonthlyPayment,
+                activeThumbColor: const Color(0xFF064E3B),
+                onChanged: (val) {
+                  setState(() {
+                    _noMonthlyPayment = val;
+                    if (val) {
+                      _minPaymentController.text = '0.0';
+                    } else if (_minPaymentController.text == '0.0' || _minPaymentController.text == '0') {
+                      _minPaymentController.text = '35.0';
+                    }
+                  });
                 },
               ),
+              if (_noMonthlyPayment)
+                Container(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.teal.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.teal.shade300),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.schedule_outlined, color: Colors.teal, size: 18),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Flexible Payoff — No fixed monthly installment',
+                          style: TextStyle(color: Colors.teal, fontWeight: FontWeight.w600, fontSize: 12),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: TextFormField(
+                    controller: _minPaymentController,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    decoration: InputDecoration(labelText: 'Min Monthly Payment ($symbol)', border: const OutlineInputBorder()),
+                    validator: (val) {
+                      if (_noMonthlyPayment) return null;
+                      final p = val == null ? null : double.tryParse(val);
+                      return p == null || p < 0 ? 'Enter min payment (0 or higher)' : null;
+                    },
+                  ),
+                ),
             ],
           ),
         ),

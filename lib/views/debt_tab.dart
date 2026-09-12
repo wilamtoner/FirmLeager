@@ -115,7 +115,7 @@ class DebtTab extends ConsumerWidget {
                                 ],
                               ),
                               const SizedBox(height: 4),
-                              Text('${d.partyName} • APR: ${d.apr.toStringAsFixed(1)}% • Min: ${Formatters.currency(d.minMonthlyPayment, symbol)}/mo'),
+                              Text(_formatDebtTerms(d, symbol)),
                               const SizedBox(height: 8),
                               LinearProgressIndicator(value: paidPct, backgroundColor: Colors.grey[300], color: Colors.green),
                               const SizedBox(height: 8),
@@ -153,7 +153,13 @@ class DebtTab extends ConsumerWidget {
                         margin: const EdgeInsets.only(bottom: 8),
                         child: ListTile(
                           title: Text(d.title),
-                          subtitle: Text('Borrower: ${d.partyName}'),
+                          subtitle: Text(
+                            d.apr == 0 && d.minMonthlyPayment == 0
+                                ? 'Borrower: ${d.partyName} • 0% Interest • Flexible'
+                                : d.apr == 0
+                                    ? 'Borrower: ${d.partyName} • 0% Interest'
+                                    : 'Borrower: ${d.partyName} • APR: ${d.apr.toStringAsFixed(1)}%',
+                          ),
                           trailing: Text(Formatters.currency(d.currentBalance, symbol), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green)),
                         ),
                       );
@@ -173,5 +179,17 @@ class DebtTab extends ConsumerWidget {
         label: const Text('Add Debt'),
       ),
     );
+  }
+
+  String _formatDebtTerms(DebtModel d, String symbol) {
+    if (d.apr == 0 && d.minMonthlyPayment == 0) {
+      return '${d.partyName} • 0% Interest (Interest-Free) • Flexible Payoff';
+    } else if (d.apr == 0) {
+      return '${d.partyName} • 0% Interest • Min: ${Formatters.currency(d.minMonthlyPayment, symbol)}/mo';
+    } else if (d.minMonthlyPayment == 0) {
+      return '${d.partyName} • APR: ${d.apr.toStringAsFixed(1)}% • Flexible Payoff';
+    } else {
+      return '${d.partyName} • APR: ${d.apr.toStringAsFixed(1)}% • Min: ${Formatters.currency(d.minMonthlyPayment, symbol)}/mo';
+    }
   }
 }

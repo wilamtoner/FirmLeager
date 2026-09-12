@@ -248,7 +248,7 @@ class _CurrencyConverterDialogState extends ConsumerState<CurrencyConverterDialo
                     FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Text(
-                        '${toInfo.symbol} ${Formatters.currency(state.convertedAmount, '').trim()}',
+                        '${toInfo.symbol} ${Formatters.number(state.convertedAmount)}',
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
