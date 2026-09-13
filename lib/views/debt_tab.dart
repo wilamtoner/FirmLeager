@@ -69,9 +69,39 @@ class DebtTab extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Top Action Header
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Debt & Loan Ledger',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: darkGreen,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 1,
+                  ),
+                  onPressed: () {
+                    showDialog(context: context, builder: (ctx) => const AddDebtDialog());
+                  },
+                  child: const Text('Add Debt', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
             // Strategy Banner Card
             Card(
-              color: Colors.indigo.shade50,
+              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E293B) : Colors.indigo.shade50,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               child: ListTile(
                 leading: const Icon(Icons.calculate, color: Colors.indigo, size: 36),
@@ -167,16 +197,6 @@ class DebtTab extends ConsumerWidget {
                   ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        heroTag: 'fab_debt_tab',
-        backgroundColor: darkGreen,
-        foregroundColor: Colors.white,
-        onPressed: () {
-          showDialog(context: context, builder: (ctx) => const AddDebtDialog());
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('Add Debt'),
       ),
     );
   }
