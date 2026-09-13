@@ -28,11 +28,8 @@ Whether managing daily sales, tracking customer credit accounts (Receivables), l
 
 ## 📚 Complete Documentation Index
 
-* 📜 [**System Constitution**](.specify/constitution.md): Architectural laws, code quality gates, testing mandates, and performance budgets.
 * 🏛️ [**Architecture Blueprint**](docs/ARCHITECTURE.md): Database schema v4 migrations, Riverpod provider graph, and mathematical formulas.
 * 📖 [**User & Operator Guide**](docs/USER_GUIDE.md): Step-by-step walkthrough for all daily accounting and debt workflows.
-* 📋 [**System Specification**](.specify/specs/comprehensive_system_spec.md): Comprehensive SpecKit requirements, data models, and Gherkin acceptance criteria.
-* ✅ [**Task Roadmap & Matrix**](.specify/tasks.md): Complete Phase 1–6 task execution status and Gantt chart.
 
 ---
 
