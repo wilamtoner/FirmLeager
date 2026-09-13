@@ -265,34 +265,54 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
             ),
             const SizedBox(height: 16),
 
-            // 3. Date Range Filter Picker
-            InkWell(
-              onTap: _selectDateRange,
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                  border: Border.all(color: isDark ? const Color(0xFF334155) : Colors.grey.shade300),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.calendar_month, color: darkGreen, size: 20),
-                        const SizedBox(width: 8),
-                        Text(
-                          dateStr,
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                        ),
-                      ],
+            // 3. Date Range Filter Picker & Add Entry Row
+            Row(
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: _selectDateRange,
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                        border: Border.all(color: isDark ? const Color(0xFF334155) : Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.calendar_month, color: darkGreen, size: 18),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              dateStr,
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const Text('Change', style: TextStyle(color: darkGreen, fontSize: 12, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
                     ),
-                    const Text('Change', style: TextStyle(color: darkGreen, fontSize: 12, fontWeight: FontWeight.bold)),
-                  ],
+                  ),
                 ),
-              ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: darkGreen,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 1,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (ctx) => const NewTransactionScreen()),
+                    );
+                  },
+                  child: const Text('Add Entry', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
 
@@ -348,16 +368,15 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
             ),
             const SizedBox(height: 20),
 
-            // 5. Mobile Primary Action Button
+            // 5. Secondary Action Button
             SizedBox(
               width: double.infinity,
-              height: 52,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: darkGreen,
-                  foregroundColor: Colors.white,
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              height: 46,
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: darkGreen,
+                  side: const BorderSide(color: darkGreen, width: 1.5),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 onPressed: () {
                   HapticFeedback.lightImpact();
@@ -365,7 +384,7 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
                 },
                 child: const Text(
                   'View All Transactions',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                 ),
               ),
             ),
@@ -555,22 +574,20 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
             height: 160,
             child: PieChart(
               PieChartData(
-                sectionsSpace: 2,
-                centerSpaceRadius: 35,
+                sectionsSpace: 3,
+                centerSpaceRadius: 40,
                 sections: [
                   PieChartSectionData(
                     value: income,
                     color: Colors.lightGreen,
-                    title: '${incomePct.toStringAsFixed(1)}%',
-                    radius: 40,
-                    titleStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 11),
+                    showTitle: false,
+                    radius: 36,
                   ),
                   PieChartSectionData(
                     value: expenses,
                     color: Colors.redAccent,
-                    title: '${expensePct.toStringAsFixed(1)}%',
-                    radius: 40,
-                    titleStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 11),
+                    showTitle: false,
+                    radius: 36,
                   ),
                 ],
               ),
@@ -598,10 +615,21 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
   Widget _buildReceivablesVsPayablesBarChart(double receivables, double payables) {
     final total = receivables + payables;
     if (total == 0) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 24.0),
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
+        decoration: BoxDecoration(
+          color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF334155) : Colors.grey.shade200,
+          ),
+        ),
         child: Center(
-          child: Text('No Barchart data available.', style: TextStyle(color: Colors.grey)),
+          child: Text(
+            'No outstanding receivables or payables',
+            style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+          ),
         ),
       );
     }
