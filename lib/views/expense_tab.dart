@@ -47,17 +47,42 @@ class _ExpenseTabState extends ConsumerState<ExpenseTab> {
     return Scaffold(
       body: Column(
         children: [
-          // Search Section
+          // Search & Add Entry Bar
           Padding(
             padding: const EdgeInsets.all(12.0),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Search transactions or party names...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              ),
-              onChanged: (val) => setState(() => _searchQuery = val),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Search transactions...',
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    ),
+                    onChanged: (val) => setState(() => _searchQuery = val),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: darkGreen,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 1,
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (ctx) => const NewTransactionScreen()),
+                    );
+                  },
+                  child: const Text(
+                    'Add Entry',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                ),
+              ],
             ),
           ),
 
@@ -226,18 +251,6 @@ class _ExpenseTabState extends ConsumerState<ExpenseTab> {
                   ),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        heroTag: 'fab_expense_tab',
-        backgroundColor: darkGreen,
-        foregroundColor: Colors.white,
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (ctx) => const NewTransactionScreen()),
-          );
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('New Entry'),
       ),
     );
   }
