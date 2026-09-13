@@ -265,54 +265,34 @@ class _DashboardTabState extends ConsumerState<DashboardTab> {
             ),
             const SizedBox(height: 16),
 
-            // 3. Date Range Filter Picker & Add Entry Row
-            Row(
-              children: [
-                Expanded(
-                  child: InkWell(
-                    onTap: _selectDateRange,
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                        border: Border.all(color: isDark ? const Color(0xFF334155) : Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.calendar_month, color: darkGreen, size: 18),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              dateStr,
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const Text('Change', style: TextStyle(color: darkGreen, fontSize: 12, fontWeight: FontWeight.bold)),
-                        ],
-                      ),
+            // 3. Date Range Filter Picker
+            InkWell(
+              onTap: _selectDateRange,
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                  border: Border.all(color: isDark ? const Color(0xFF334155) : Colors.grey.shade300),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.calendar_month, color: darkGreen, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          dateStr,
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        ),
+                      ],
                     ),
-                  ),
+                    const Text('Change', style: TextStyle(color: darkGreen, fontSize: 12, fontWeight: FontWeight.bold)),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: darkGreen,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    elevation: 1,
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (ctx) => const NewTransactionScreen()),
-                    );
-                  },
-                  child: const Text('Add Entry', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                ),
-              ],
+              ),
             ),
             const SizedBox(height: 16),
 
