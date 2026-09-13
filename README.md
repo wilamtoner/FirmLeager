@@ -1,19 +1,19 @@
 # FirmLedger: Small Business Accounting, Expense & Debt Manager
 
 <p align="center">
-  <img src="assets/images/app_logo.jpg" alt="FirmLedger Logo" width="130" style="border-radius: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);"/>
+  <img src="assets/images/app_logo.png" alt="FirmLedger Logo" width="130" style="border-radius: 28px; box-shadow: 0 8px 24px rgba(0,0,0,0.18);"/>
 </p>
 
 <p align="center">
-  <b>The Ultimate Open-Source Small Business Accounting, Firm Ledger, Cash Flow Tracker, Real-Time Currency Converter & Debt Payoff Management App built with Flutter, Riverpod, SQLite, and FL Chart.</b>
+  <b>High-Performance Small Business Financial Accounting, General Ledger, Cash Flow Analytics, Live Nepal Gold & Silver Rates, Nepali Date Converter, Real-Time Currency Converter & Debt Manager built with Flutter, Riverpod, SQLite, and FL Chart.</b>
 </p>
 
 <p align="center">
-  <a href="https://flutter.dev"><img src="https://img.shields.io/badge/Flutter-3.35+-02569B?style=for-the-badge&logo=flutter" alt="Flutter"/></a>
+  <a href="https://flutter.dev"><img src="https://img.shields.io/badge/Flutter-3.24+-02569B?style=for-the-badge&logo=flutter" alt="Flutter"/></a>
   <a href="https://dart.dev"><img src="https://img.shields.io/badge/Dart-3.6+-0175C2?style=for-the-badge&logo=dart" alt="Dart"/></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge" alt="License"/></a>
-  <a href="test"><img src="https://img.shields.io/badge/Tests-28%2F28%20Passing-brightgreen?style=for-the-badge" alt="Tests"/></a>
-  <a href=".specify/constitution.md"><img src="https://img.shields.io/badge/SpecKit-Governed-purple?style=for-the-badge" alt="SpecKit"/></a>
+  <a href="test"><img src="https://img.shields.io/badge/Tests-48%2F48%20Passing-brightgreen?style=for-the-badge" alt="Tests"/></a>
+  <a href="https://fonts.google.com/specimen/Plus+Jakarta+Sans"><img src="https://img.shields.io/badge/Typography-Plus%20Jakarta%20Sans-0D6EFD?style=for-the-badge" alt="Typography"/></a>
 </p>
 
 ---
@@ -38,44 +38,67 @@ Whether managing daily sales, tracking customer credit accounts (Receivables), l
 
 ## 🌟 Key Features
 
-### 📊 1. Financial Dashboard & 2x2 Grid
+### 📊 1. Financial Dashboard & Gradient Line Analytics
 - **Firm Profile Banner**: Displays business name, PAN/VAT/GST tax registration ID, address, and dynamic currency symbol (`Rs`, `$`, `€`, `£`, `₹`, `¥`).
-- **2x2 General Ledger Grid**:
+- **2x2 General Ledger Matrix**:
   - 🟢 **Income (Revenue)**: Tracks total revenue with breakdown drilldown modals.
   - 🔴 **Expense (Outflows)**: Monitors operational expenditures, stock purchases, and utilities.
   - 🟦 **Receivables (Money to Collect)**: Tracks customer credit sales and debtor balances.
   - 🔴 **Payables (Money Due)**: Manages supplier credit purchases and vendor liabilities.
-- **Dynamic Date Range Filter**: Interactive date range selector (`YYYY-MM-DD` to `YYYY-MM-DD`) strictly bounding all dashboard calculations.
+- **Dynamic Date Range Filter**: Interactive date range selector strictly bounding all dashboard calculations.
+- **Gradient Line Chart Analytics**: Smooth spline curve visualization comparing inflow vs. outflow trends over time with interactive touch indicators.
 
-### 💱 2. Real-Time Multi-Currency Converter
-- **Live Exchange Rates**: Fetches live foreign exchange rates directly from `open.er-api.com` for 160+ world currencies without requiring any API key.
-- **Cross-Currency Triangulation**: Convert between any two currencies seamlessly (e.g. EUR $\to$ NPR, INR $\to$ GBP).
+### 🥇 2. Live Nepal Gold & Silver Rates with Jewelry Calculator
+- **Live FENEGOSIDA Rates**: Real-time official rates for Fine Gold (*छापावाल सुन*), Tejabi Gold, and Pure Silver from the Federation of Nepal Gold and Silver Dealers' Association.
+- **Interactive Jewelry Calculator**: Computes exact jewelry costs across **Tola**, **Gram**, and **Lal** units with customizable making charges and wastage percentages.
+- **Offline Resilience**: Automatically serves pre-cached baseline market rates when operating without an internet connection.
+
+### 📅 3. Nepali Bikram Sambat (BS) & English (AD) Date Converter
+- **Bidirectional Conversion**: Convert Gregorian (AD) dates to Bikram Sambat (BS) dates and vice versa.
+- **Cultural Calendar Metadata**: Displays dates in both Devanagari script and English transliteration with weekday and festival month names.
+- **Date Difference & Age Calculator**: Calculates exact duration between any two dates in years, months, and days.
+- **UTC Leap-Safe Math**: Eliminates client daylight saving time (DST) shifts.
+
+### 💱 4. Real-Time Multi-Currency Converter
+- **Live FX Rates**: Triangulates exchange rates across 160+ world currencies via `open.er-api.com`.
+- **One-Tap Inversion (`⇄`)**: Invert source and target currencies with live reciprocal math.
 - **Offline Fallback**: Pre-cached currency dictionary ensures instant conversion calculations even without internet access.
-- **One-Tap Currency Swap (`⇄`)**: Invert source and target currencies with live reciprocal math.
 
-### 📝 3. Income & Expense Entry Form
-- **Income $\leftrightarrow$ Expense Segment Switcher**: Fast single-screen form toggling.
-- **Form Navigation Protection (`PopScope`)**: Warns before leaving unsaved input, preventing accidental data loss during back gestures or Esc triggers.
-- **Categorized Inputs**: Goods/Product Sales, Service Revenue, Stock Purchases, Utilities, and Operating Expenses.
-- **Automatic Credit Sync**: Selecting `Payment Method: Credit / On Account` automatically creates a **Receivable (Owed to Me)** or **Payable (Owed by Me)** debt entry in the ledger.
+### 📋 5. Dedicated Debt & Loan Management
+- **Full-Page Entry Screen**: Clean form design with *Plus Jakarta Sans* typography.
+- **Flexible Terms**: Supports **0% Interest** (friend & family loans, supplier credit) and **Flexible Payment Terms** (zero mandatory monthly minimum).
+- **Payment Logging**: Record partial or full repayments with automatic balance updating and audit history.
+- **Navigation Guard (`PopScope`)**: Prevents accidental data loss if navigating away with unsaved details.
 
-### 🎯 4. Category Budget Limits & Alert Thresholds
+### 🎯 6. Category Budget Limits & Alert Thresholds
 - **Monthly Budget Bars**: Visual progress bars in the ledger tab tracking spending against category budget limits.
 - **Color-Coded Status**:
   - 🟢 Under 80%: Normal spending
   - 🟡 80% – 99%: Nearing budget limit
   - 🔴 100%+: Visual alert badge signaling over-budget status
 
-### 🧮 5. Debt Payoff Engine (Snowball vs. Avalanche)
-- **Snowball Method ❄️**: Prioritizes lowest balance first to build psychological momentum.
-- **Avalanche Method 🏔️**: Prioritizes highest interest rate (APR %) first to mathematically minimize total interest paid.
-- **Extra Budget Slider**: Interactive slider ($0–$1,000/mo) calculating real-time payoff time reductions.
-- **Synchronized Currency**: Respects the firm's configured currency symbol dynamically across all interest, balance, and repayment views.
-
-### 📄 6. Statements, Export & Backup
+### 📄 7. Statements, Export & Backup
 - **PDF Invoice & Statement Generator**: Multi-page formal business statement featuring firm letterhead, PAN/VAT ID, financial KPI summary cards, transaction table, and signatory authorization block.
 - **CSV Statement Exporter**: Generates formatted CSV files (`firm_statement.csv`) ready for Tally, QuickBooks, or Microsoft Excel import.
 - **Structured JSON Backup & Restore**: Export and import full-database snapshots offline for reliable disaster recovery.
+
+---
+
+## ⚡ App Size & Performance Optimization
+
+Through aggressive code minification, asset pruning, and architecture-targeted packaging, the production application footprint has been reduced by **~65%**:
+
+| Metric | Before Optimization | After Optimization | Reduction |
+| :--- | :--- | :--- | :--- |
+| **`app-armeabi-v7a-release.apk`** | 57.0 MB (fat APK) | **18.1 MB** | **-68.2%** |
+| **`app-arm64-v8a-release.apk`** | 57.0 MB (fat APK) | **20.5 MB** | **-64.0%** |
+| **`app-x86_64-release.apk`** | 57.0 MB (fat APK) | **22.0 MB** | **-61.4%** |
+| **Bundled Assets (`assets/`)** | ~1.3 MB | **376 KB** | **-71.1%** |
+| **Material Icons Font** | 1.64 MB | **6.8 KB** (Tree-shaken) | **-99.6%** |
+
+- **R8 / ProGuard Code & Resource Shrinking**: Unused Kotlin/Java bytecode and resources are stripped during release compilation.
+- **100% Offline Plus Jakarta Sans Typography**: Direct font bundling eliminates runtime HTTP font downloads and pruned **15 transitive packages**.
+- **Quantized App Graphics**: App logo optimized with 256-color palette compression (from 468 KB to 18 KB).
 
 ---
 
@@ -83,50 +106,66 @@ Whether managing daily sales, tracking customer credit accounts (Receivables), l
 
 ```
 expense_debt_manager/
-├── android/                         # Android App Wrapper (Kotlin 2.4, Impeller Vulkan)
-├── linux/                           # Linux Native C++ GTK Wrapper (SQLite FFI)
-├── assets/images/app_logo.jpg       # App Logo Asset
+├── android/                         # Android App Wrapper (Kotlin 2.4, R8 / ProGuard Enabled)
+│   ├── app/
+│   │   ├── build.gradle.kts         # Minification, Resource Shrinking & ABI Split Config
+│   │   └── proguard-rules.pro       # Flutter & SQLite Reflection Preservation Rules
+├── assets/
+│   ├── fonts/                       # Plus Jakarta Sans (Regular & Italic)
+│   └── images/                      # App Logo (512x512 Quantized PNG)
 ├── docs/
 │   ├── ARCHITECTURE.md              # System Architecture & Schema Specification
 │   └── USER_GUIDE.md                # Operator & User Manual
-├── .specify/
-│   ├── constitution.md              # Engineering Constitution & Quality Gates
-│   ├── tasks.md                     # Roadmap, Tasks & Gantt Timeline
-│   └── specs/                       # Comprehensive System Specifications
 ├── lib/
-│   ├── main.dart                   # Root ProviderScope & Material 3 Theme
-│   ├── models/
-│   │   ├── transaction.dart        # Transaction Entity & Serialization
-│   │   ├── category.dart           # Category & Budget Limit Entity
-│   │   ├── debt.dart               # Bilateral Debt & Loan Entity
-│   │   ├── recurring_transaction.dart # Periodic Recurring Schedule Entity
-│   │   └── firm_profile.dart       # Firm Profile & Currency Configuration
-│   ├── providers/
-│   │   ├── transaction_provider.dart # Transactions State Notifier
-│   │   ├── debt_provider.dart        # Debt Ledger State Notifier
-│   │   ├── dashboard_provider.dart   # KPI & Category Budget Status Providers
-│   │   ├── currency_provider.dart    # Live Currency Conversion State Notifier
-│   │   ├── recurring_provider.dart   # Recurring Auto-Processing Provider
-│   │   └── firm_provider.dart        # Firm Settings State Notifier
-│   ├── services/
-│   │   ├── database_service.dart     # SQLite Database Service (Schema Version 4)
-│   │   └── currency_service.dart     # Real-Time Rate Service (open.er-api.com)
-│   ├── utils/
-│   │   ├── debt_calculator.dart      # Snowball vs. Avalanche Payoff Engine
-│   │   ├── pdf_invoice_generator.dart# Multi-page Business PDF Generator
-│   │   ├── csv_exporter.dart         # RFC-4180 CSV Statement Exporter
-│   │   ├── backup_service.dart       # JSON Database Snapshot Backup & Restore
-│   │   └── formatters.dart           # Dynamic Currency & Date Formatters
-│   └── views/
-│       ├── home_screen.dart          # Responsive Navigation & Material 3 AppBar
-│       ├── dashboard_tab.dart        # 2x2 KPI Grid, Horizontal Quick Actions & Charts
-│       ├── expense_tab.dart          # Transaction Search, Filter Chips & Budget Cards
-│       ├── debt_tab.dart             # Debts I Owe & Owed to Me Lists
-│       ├── debt_payoff_screen.dart   # Debt Payoff Simulator with Extra Budget Slider
-│       ├── currency_converter_dialog.dart # Live Currency Converter Modal Dialog
-│       ├── new_transaction_screen.dart # Transaction Form with PopScope Guard
-│       └── edit_firm_dialog.dart     # Firm Profile Bottom Sheet Modal
-├── test/                            # 28 Automated Unit & Invariant Tests (100% Passing)
+│   ├── main.dart                    # App Entry Point & Plus Jakarta Sans Theme
+│   ├── models/                      # Domain Entities & Serialization
+│   │   ├── category.dart            # Category & Budget Limit Model
+│   │   ├── debt.dart                # Bilateral Debt & Loan Model
+│   │   ├── debt_payment.dart        # Debt Payment Record Model
+│   │   ├── firm_profile.dart        # Business Profile & Currency Model
+│   │   ├── gold_silver_rate.dart    # FENEGOSIDA Commodity Rate Model
+│   │   ├── recurring_transaction.dart # Periodic Recurring Schedule Model
+│   │   └── transaction.dart         # Income/Expense Transaction Model
+│   ├── providers/                   # State Management (Riverpod)
+│   │   ├── category_provider.dart   # Categories State
+│   │   ├── currency_provider.dart   # Live FX Rate State
+│   │   ├── dashboard_provider.dart  # KPI & Category Budget Status
+│   │   ├── debt_provider.dart       # Debt Ledger & Payment State
+│   │   ├── firm_provider.dart       # Firm Settings State
+│   │   ├── gold_silver_provider.dart# Live Gold/Silver Price State
+│   │   ├── recurring_provider.dart  # Recurring Auto-Processing State
+│   │   ├── theme_provider.dart      # Dark/Light Theme State
+│   │   └── transaction_provider.dart# Transaction Ledger State
+│   ├── services/                    # Background & Database Services
+│   │   ├── currency_service.dart    # FX Exchange Rate Engine
+│   │   ├── database_service.dart    # SQLite Engine (Schema v4 with Indexes)
+│   │   └── gold_silver_service.dart # FENEGOSIDA Commodity Engine & Math
+│   ├── theme/                       # Design System
+│   │   └── app_colors.dart          # Executive Palette (Navy #0A2540, Azure #0D6EFD, Cyan #38BDF8)
+│   ├── utils/                       # Utility Helpers
+│   │   ├── backup_service.dart      # JSON Snapshot Backup & Restore
+│   │   ├── csv_exporter.dart        # RFC-4180 CSV Statement Generator
+│   │   ├── debt_calculator.dart     # Snowball vs. Avalanche Payoff Engine
+│   │   ├── formatters.dart          # Dynamic Currency, Date & Number Formatters
+│   │   ├── nepali_date_helper.dart  # Bikram Sambat (BS) & English (AD) Calendar Math
+│   │   └── pdf_invoice_generator.dart # Multi-Page Business Statement PDF Generator
+│   └── views/                       # User Interface Views & Screens
+│       ├── add_debt_dialog.dart     # Quick-Add Debt Modal
+│       ├── add_transaction_dialog.dart # Quick-Add Transaction Modal
+│       ├── card_detail_dialog.dart  # Financial KPI Breakdown Modal
+│       ├── currency_converter_dialog.dart # Currency Converter Dialog
+│       ├── currency_converter_screen.dart # Full-Page Currency Converter
+│       ├── dashboard_tab.dart       # KPI Matrix, Line Charts & Gold Ticker
+│       ├── date_converter_screen.dart # Nepali BS & AD Date Converter Screen
+│       ├── debt_tab.dart            # Debt Ledger, Receivables & Payables
+│       ├── edit_firm_dialog.dart    # Firm Profile Editor
+│       ├── expense_tab.dart         # Transaction List, Filter Chips & Search
+│       ├── gold_silver_screen.dart  # Live Commodities & Calculator Screen
+│       ├── home_screen.dart         # Scaffold, NavigationBar & Action Menus
+│       ├── new_debt_screen.dart     # Dedicated Add Debt/Loan Screen
+│       ├── new_transaction_screen.dart # Dedicated Add Transaction Screen
+│       └── splash_screen.dart       # Animated Splash Screen
+├── test/                            # 48 Automated Unit, Model & Widget Tests (100% Passing)
 ├── pubspec.yaml
 ├── LICENSE                          # MIT License
 └── README.md

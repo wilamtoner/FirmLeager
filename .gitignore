@@ -46,3 +46,10 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Agents & Skills
+.agents/
+.agent
+skills-lock.json
+tool/
+test/skills_validation_test.dart
