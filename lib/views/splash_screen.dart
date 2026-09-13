@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
+import '../theme/app_colors.dart';
 
 class SplashScreen extends StatefulWidget {
   final Duration duration;
@@ -73,7 +74,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     final stepDuration = widget.duration.inMilliseconds / totalSteps;
     int currentStep = 0;
 
-    Timer.periodic(Duration(milliseconds: stepDuration.round()), (timer) {
+    _timer = Timer.periodic(Duration(milliseconds: stepDuration.round()), (timer) {
       if (!mounted) {
         timer.cancel();
         return;
@@ -86,7 +87,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
         if (_progress < 0.30) {
           _statusMessage = 'Initializing secure vault...';
         } else if (_progress < 0.60) {
-          _statusMessage = 'Loading accounts & budgets...';
+          _statusMessage = 'Loading accounts & transactions...';
         } else if (_progress < 0.88) {
           _statusMessage = 'Syncing market rates & debt engine...';
         } else {
@@ -130,11 +131,11 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
-    const darkGreen = Color(0xFF064E3B);
-    const deepNavy = Color(0xFF0B132B);
-    const emerald = Color(0xFF047857);
-    const mintAccent = Color(0xFF10B981);
-    const brightMint = Color(0xFF34D399);
+    const royalBlue = AppColors.primaryBlue;
+    const deepNavy = AppColors.primaryDark;
+    const midnightObsidian = Color(0xFF061325);
+    const cyanAccent = AppColors.electricCyan;
+    const softCyan = Color(0xFF7DD3FC);
 
     return Scaffold(
       body: Stack(
@@ -152,9 +153,9 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                     center: Alignment(0.0, -0.15 + (pulse * 0.05)),
                     radius: 1.1 + (pulse * 0.08),
                     colors: const [
-                      emerald,
-                      darkGreen,
+                      Color(0xFF1D4ED8),
                       deepNavy,
+                      midnightObsidian,
                     ],
                     stops: const [0.0, 0.45, 1.0],
                   ),
@@ -192,8 +193,8 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                                 shape: BoxShape.circle,
                                 gradient: RadialGradient(
                                   colors: [
-                                    mintAccent.withValues(alpha: 0.35 + (haloPulse * 0.2)),
-                                    brightMint.withValues(alpha: 0.15),
+                                    cyanAccent.withValues(alpha: 0.35 + (haloPulse * 0.2)),
+                                    softCyan.withValues(alpha: 0.15),
                                     Colors.transparent,
                                   ],
                                   stops: const [0.2, 0.65, 1.0],
@@ -209,12 +210,12 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                                 borderRadius: BorderRadius.circular(30),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.4),
+                                    color: Colors.black.withValues(alpha: 0.45),
                                     blurRadius: 28,
                                     offset: const Offset(0, 14),
                                   ),
                                   BoxShadow(
-                                    color: mintAccent.withValues(alpha: 0.35),
+                                    color: cyanAccent.withValues(alpha: 0.35),
                                     blurRadius: 36,
                                     spreadRadius: 2,
                                     offset: const Offset(0, 4),
@@ -229,7 +230,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                                   height: 130,
                                   fit: BoxFit.cover,
                                   errorBuilder: (ctx, _, __) => Container(
-                                    color: mintAccent,
+                                    color: royalBlue,
                                     child: const Icon(Icons.account_balance_wallet,
                                         size: 64, color: Colors.white),
                                   ),
@@ -274,7 +275,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                           color: Colors.white.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: mintAccent.withValues(alpha: 0.35),
+                            color: cyanAccent.withValues(alpha: 0.35),
                             width: 1,
                           ),
                         ),
@@ -350,13 +351,13 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                                   width: constraints.maxWidth * _progress,
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
-                                      colors: [mintAccent, brightMint, Colors.white],
+                                      colors: [cyanAccent, royalBlue, Colors.white],
                                       stops: [0.0, 0.85, 1.0],
                                     ),
                                     borderRadius: BorderRadius.circular(6),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: mintAccent.withValues(alpha: 0.6),
+                                        color: cyanAccent.withValues(alpha: 0.6),
                                         blurRadius: 8,
                                         offset: const Offset(0, 2),
                                       ),
@@ -386,7 +387,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                               style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: brightMint,
+                                color: cyanAccent,
                                 fontFamily: 'monospace',
                               ),
                             ),

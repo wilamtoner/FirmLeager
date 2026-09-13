@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:uuid/uuid.dart';
 import '../models/transaction.dart';
 import '../models/category.dart';
 import '../models/debt.dart';
@@ -267,7 +268,7 @@ class DatabaseService {
 
       if (r.nextDueDate.isBefore(now) || r.nextDueDate.isAtSameMomentAs(now)) {
         final tx = TransactionModel(
-          id: '${DateTime.now().millisecondsSinceEpoch}_${r.id.length >= 4 ? r.id.substring(0, 4) : r.id}',
+          id: const Uuid().v4(),
           title: '${r.title} (Recurring)',
           amount: r.amount,
           type: r.type,

@@ -3,11 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/transaction_provider.dart';
 import '../providers/category_provider.dart';
 import '../providers/firm_provider.dart';
-import '../providers/dashboard_provider.dart';
 import '../models/transaction.dart';
 import '../models/category.dart';
 import '../utils/formatters.dart';
 import 'new_transaction_screen.dart';
+
+import '../theme/app_colors.dart';
 
 class ExpenseTab extends ConsumerStatefulWidget {
   const ExpenseTab({super.key});
@@ -20,14 +21,15 @@ class _ExpenseTabState extends ConsumerState<ExpenseTab> {
   String _searchQuery = '';
   String _filterType = 'all';
 
-  static const Color darkGreen = Color(0xFF064E3B);
+  static const Color brandPrimary = AppColors.primaryBlue;
+  static const Color incomeColor = AppColors.incomeGreen;
+  static const Color darkGreen = brandPrimary;
 
   @override
   Widget build(BuildContext context) {
     final transactions = ref.watch(transactionProvider);
     final categories = ref.watch(categoryProvider);
     final firm = ref.watch(firmProvider);
-    final budgetStatuses = ref.watch(categoryBudgetProvider);
 
     final filtered = transactions.where((t) {
       final matchesSearch = t.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
@@ -106,77 +108,6 @@ class _ExpenseTabState extends ConsumerState<ExpenseTab> {
           ),
           const SizedBox(height: 6),
 
-          // Monthly Category Budgets & Alerts
-          if (budgetStatuses.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
-              child: Card(
-                elevation: 0,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? const Color(0xFF1E293B)
-                    : const Color(0xFFF1F5F9),
-                shape: RoundedRectangleBorder(
-                  side: BorderSide(
-                    color: budgetStatuses.any((b) => b.isOverBudget)
-                        ? Colors.red.shade400
-                        : (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF334155) : Colors.grey.shade300),
-                    width: budgetStatuses.any((b) => b.isOverBudget) ? 1.5 : 1,
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Theme(
-                  data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-                  child: ExpansionTile(
-                    initiallyExpanded: budgetStatuses.any((b) => b.isNearBudget || b.isOverBudget),
-                    tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-                    leading: Icon(
-                      budgetStatuses.any((b) => b.isOverBudget)
-                          ? Icons.warning_amber_rounded
-                          : Icons.account_balance_wallet_outlined,
-                      size: 20,
-                      color: budgetStatuses.any((b) => b.isOverBudget) ? Colors.red : darkGreen,
-                    ),
-                    title: Row(
-                      children: [
-                        const Text(
-                          'Category Budgets',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                        ),
-                        const Spacer(),
-                        if (budgetStatuses.any((b) => b.isOverBudget))
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.red.shade100,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              '${budgetStatuses.where((b) => b.isOverBudget).length} Over Budget!',
-                              style: TextStyle(
-                                color: Colors.red.shade900,
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
-                        child: Column(
-                          children: budgetStatuses
-                              .map((b) => _buildBudgetProgressRow(b, firm.currencySymbol))
-                              .toList(),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          const SizedBox(height: 6),
-
           // Transaction List
           Expanded(
             child: filtered.isEmpty
@@ -206,16 +137,52 @@ class _ExpenseTabState extends ConsumerState<ExpenseTab> {
                           padding: const EdgeInsets.only(right: 20),
                           child: const Icon(Icons.delete, color: Colors.white),
                         ),
-                        direction: DismissDirection.endToStart,
+                        confirmDismiss: (direction) async {
+                          return await showDialog<bool>(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: const Text('Delete Entry'),
+                              content: Text('Are you sure you want to delete "${t.title}"?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(ctx).pop(false),
+                                  child: const Text('Cancel'),
+                                ),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                    foregroundColor: Colors.white,
+                                  ),
+                                  onPressed: () => Navigator.of(ctx).pop(true),
+                                  child: const Text('Delete'),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                         onDismissed: (_) {
-                          ref.read(transactionProvider.notifier).deleteTransaction(t.id);
+                          final deletedItem = t;
+                          ref.read(transactionProvider.notifier).deleteTransaction(deletedItem.id);
+                          ScaffoldMessenger.of(context).clearSnackBars();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Deleted "${deletedItem.title}"'),
+                              action: SnackBarAction(
+                                label: 'Undo',
+                                onPressed: () {
+                                  ref.read(transactionProvider.notifier).addTransaction(deletedItem);
+                                },
+                              ),
+                              duration: const Duration(seconds: 4),
+                            ),
+                          );
                         },
                         child: Card(
                           margin: const EdgeInsets.only(bottom: 8),
                           child: ListTile(
                             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                             leading: CircleAvatar(
-                              backgroundColor: t.type == TransactionType.income ? darkGreen : Colors.redAccent,
+                              backgroundColor: t.type == TransactionType.income ? incomeColor : AppColors.expenseRed,
                               child: Icon(
                                 t.type == TransactionType.income ? Icons.arrow_downward : Icons.arrow_upward,
                                 color: Colors.white,
@@ -241,7 +208,7 @@ class _ExpenseTabState extends ConsumerState<ExpenseTab> {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15,
-                                color: t.type == TransactionType.income ? darkGreen : Colors.red,
+                                color: t.type == TransactionType.income ? incomeColor : AppColors.expenseRed,
                               ),
                             ),
                           ),
@@ -281,68 +248,6 @@ class _ExpenseTabState extends ConsumerState<ExpenseTab> {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(4)),
       child: Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
-    );
-  }
-
-  Widget _buildBudgetProgressRow(CategoryBudgetStatus b, String symbol) {
-    Color progressColor;
-    if (b.isOverBudget) {
-      progressColor = Colors.red;
-    } else if (b.isNearBudget) {
-      progressColor = Colors.amber.shade700;
-    } else {
-      progressColor = darkGreen;
-    }
-
-    final double clampedProgress = (b.percentage / 100.0).clamp(0.0, 1.0);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: Color(b.category.colorHex),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    b.category.name,
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                  ),
-                ],
-              ),
-              Text(
-                '$symbol${b.spentAmount.toStringAsFixed(0)} / $symbol${b.budgetLimit.toStringAsFixed(0)} (${b.percentage.toStringAsFixed(0)}%)',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: b.isOverBudget ? Colors.red : null,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: clampedProgress,
-              minHeight: 6,
-              backgroundColor: Colors.grey.shade300,
-              valueColor: AlwaysStoppedAnimation<Color>(progressColor),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

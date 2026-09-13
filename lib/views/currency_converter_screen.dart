@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/currency_provider.dart';
 import '../services/currency_service.dart';
 import '../utils/formatters.dart';
+import '../theme/app_colors.dart';
 
 class CurrencyConverterScreen extends ConsumerStatefulWidget {
   const CurrencyConverterScreen({super.key});
@@ -59,8 +60,8 @@ class _CurrencyConverterScreenState extends ConsumerState<CurrencyConverterScree
     final unitRate = service.convert(amount: 1.0, from: state.fromCurrency, to: state.toCurrency);
     final inverseRate = service.convert(amount: 1.0, from: state.toCurrency, to: state.fromCurrency);
 
-    const darkGreen = Color(0xFF064E3B);
-    const emerald = Color(0xFF047857);
+    const darkGreen = AppColors.primaryDark;
+    const emerald = Color(0xFF1E40AF);
 
     return Scaffold(
       appBar: AppBar(
@@ -166,7 +167,7 @@ class _CurrencyConverterScreenState extends ConsumerState<CurrencyConverterScree
                           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                         ),
                         onChanged: (val) {
-                          final parsed = double.tryParse(val) ?? 0.0;
+                          final parsed = double.tryParse(val.replaceAll(',', '.').trim()) ?? 0.0;
                           notifier.setAmount(parsed);
                         },
                       ),

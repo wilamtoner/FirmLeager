@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
 import '../models/debt.dart';
 import '../models/debt_payment.dart';
 import '../services/database_service.dart';
@@ -30,14 +31,17 @@ class DebtNotifier extends StateNotifier<List<DebtModel>> {
     required DateTime date,
     String? notes,
   }) async {
-    final debt = state.firstWhere((d) => d.id == debtId);
+    final matches = state.where((d) => d.id == debtId);
+    if (matches.isEmpty) return;
+    final debt = matches.first;
+
     double newBalance = debt.currentBalance - amount;
     if (newBalance < 0) newBalance = 0;
 
     await _db.updateDebtBalance(debtId, newBalance);
 
     final payment = DebtPaymentModel(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: const Uuid().v4(),
       debtId: debtId,
       amount: amount,
       date: date,

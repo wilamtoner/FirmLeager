@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/firm_provider.dart';
+import '../theme/app_colors.dart';
 
 class EditFirmDialog extends ConsumerStatefulWidget {
   const EditFirmDialog({super.key});
@@ -140,7 +141,7 @@ class _EditFirmDialogState extends ConsumerState<EditFirmDialog> {
                   height: 50,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF064E3B),
+                      backgroundColor: AppColors.primaryBlue,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),

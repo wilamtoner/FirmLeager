@@ -6,6 +6,7 @@ import 'package:expense_debt_manager/main.dart';
 import 'package:expense_debt_manager/views/home_screen.dart';
 import 'package:expense_debt_manager/views/splash_screen.dart';
 import 'package:expense_debt_manager/views/add_debt_dialog.dart';
+import 'package:expense_debt_manager/views/new_debt_screen.dart';
 
 void main() {
   setUpAll(() {
@@ -99,5 +100,33 @@ void main() {
 
     // Min payment input replaced with Flexible Payoff badge
     expect(find.text('Flexible Payoff — No fixed monthly installment'), findsOneWidget);
+  });
+
+  testWidgets('NewDebtScreen renders full page form and toggles interest terms', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(
+          home: NewDebtScreen(),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    // Verify screen elements
+    expect(find.text('New Liability (I Owe)'), findsOneWidget);
+    expect(find.text('I Owe (Liability)'), findsOneWidget);
+    expect(find.text('Owed to Me (Asset)'), findsOneWidget);
+    expect(find.text('Debt / Loan Title*'), findsOneWidget);
+    expect(find.text('Lender / Creditor Name*'), findsOneWidget);
+    expect(find.text('Save Liability Record'), findsOneWidget);
+
+    // Switch to Asset
+    await tester.tap(find.text('Owed to Me (Asset)'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('New Asset (Owed to Me)'), findsOneWidget);
+    expect(find.text('Borrower / Debtor Name*'), findsOneWidget);
+    expect(find.text('Save Asset Record'), findsOneWidget);
   });
 }

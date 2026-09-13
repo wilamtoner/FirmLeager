@@ -115,6 +115,25 @@ void main() {
       expect(debt.currentBalance, 15000.0);
     });
 
+    test('debt fromMap handles boolean isOwedByMe from JSON', () {
+      final map = {
+        'id': 'debt-002-bool',
+        'title': 'Customer Credit',
+        'partyName': 'Retailer XYZ',
+        'isOwedByMe': true,
+        'originalAmount': 20000,
+        'currentBalance': 15000,
+        'apr': 0,
+        'minMonthlyPayment': 1000,
+        'dueDate': DateTime(2026, 6, 30).toIso8601String(),
+        'notes': null,
+      };
+
+      final debt = DebtModel.fromMap(map);
+      expect(debt.isOwedByMe, isTrue);
+      expect(debt.currentBalance, 15000.0);
+    });
+
     test('copyWith modifies balance correctly', () {
       final debt = DebtModel(
         id: 'debt-003',
@@ -132,6 +151,37 @@ void main() {
       expect(updated.currentBalance, 6000);
       expect(updated.originalAmount, 10000);
       expect(updated.id, debt.id);
+    });
+
+    test('copyWith modifies all optional fields correctly', () {
+      final debt = DebtModel(
+        id: 'debt-1',
+        title: 'Old Title',
+        partyName: 'Old Party',
+        isOwedByMe: true,
+        originalAmount: 1000,
+        currentBalance: 800,
+        apr: 10.0,
+        minMonthlyPayment: 100,
+        dueDate: DateTime(2025, 1, 1),
+        notes: 'Old note',
+      );
+
+      final updated = debt.copyWith(
+        title: 'New Title',
+        partyName: 'New Party',
+        isOwedByMe: false,
+        apr: 0.0,
+        notes: 'New note',
+      );
+
+      expect(updated.title, 'New Title');
+      expect(updated.partyName, 'New Party');
+      expect(updated.isOwedByMe, false);
+      expect(updated.apr, 0.0);
+      expect(updated.notes, 'New note');
+      expect(updated.originalAmount, 1000);
+      expect(updated.currentBalance, 800);
     });
   });
 

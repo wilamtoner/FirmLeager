@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'views/splash_screen.dart';
 import 'providers/theme_provider.dart';
+import 'theme/app_colors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,69 +26,73 @@ class ExpenseDebtApp extends ConsumerWidget {
   final Widget? home;
   const ExpenseDebtApp({super.key, this.home});
 
-  static const Color emeraldGreen = Color(0xFF064E3B);
-  static const Color mintAccent = Color(0xFF10B981);
+  static const Color emeraldGreen = AppColors.primaryDark;
+  static const Color mintAccent = AppColors.primaryBlue;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
 
+    final lightBaseTheme = ThemeData(
+      useMaterial3: true,
+      fontFamily: 'Plus Jakarta Sans',
+      brightness: Brightness.light,
+      scaffoldBackgroundColor: AppColors.scaffoldLight,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: AppColors.primaryBlue,
+        primary: AppColors.primaryBlue,
+        secondary: AppColors.electricCyan,
+        surface: AppColors.surfaceLight,
+        brightness: Brightness.light,
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: AppColors.primaryDark,
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
+      cardTheme: CardThemeData(
+        elevation: 1,
+        shadowColor: Colors.black.withValues(alpha: 0.04),
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(color: AppColors.cardBorderLight, width: 1),
+          borderRadius: BorderRadius.circular(16),
+        ),
+      ),
+    );
+
+    final darkBaseTheme = ThemeData(
+      useMaterial3: true,
+      fontFamily: 'Plus Jakarta Sans',
+      brightness: Brightness.dark,
+      scaffoldBackgroundColor: AppColors.scaffoldDark,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: AppColors.primaryBlue,
+        primary: AppColors.electricCyan,
+        secondary: const Color(0xFF60A5FA),
+        surface: AppColors.cardSurfaceDark,
+        brightness: Brightness.dark,
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFF071B2F),
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
+      cardTheme: CardThemeData(
+        elevation: 2,
+        shadowColor: Colors.black.withValues(alpha: 0.3),
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(color: AppColors.cardBorderDark, width: 1),
+          borderRadius: BorderRadius.circular(16),
+        ),
+      ),
+    );
+
     return MaterialApp(
       title: 'FirmLedger: Expense & Debt',
       debugShowCheckedModeBanner: false,
       themeMode: themeMode,
-      // Modern Light Theme
-      theme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.light,
-        scaffoldBackgroundColor: const Color(0xFFF8FAFC),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: emeraldGreen,
-          primary: emeraldGreen,
-          secondary: mintAccent,
-          surface: Colors.white,
-          brightness: Brightness.light,
-        ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: emeraldGreen,
-          foregroundColor: Colors.white,
-          elevation: 0,
-        ),
-        cardTheme: CardThemeData(
-          elevation: 1,
-          shadowColor: Colors.black.withValues(alpha: 0.05),
-          shape: RoundedRectangleBorder(
-            side: BorderSide(color: Colors.green.shade100, width: 1),
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-      ),
-      // Modern Financial Dark Theme
-      darkTheme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF0F172A),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: emeraldGreen,
-          primary: mintAccent,
-          secondary: const Color(0xFF34D399),
-          surface: const Color(0xFF1E293B),
-          brightness: Brightness.dark,
-        ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF022C22),
-          foregroundColor: Colors.white,
-          elevation: 0,
-        ),
-        cardTheme: CardThemeData(
-          elevation: 2,
-          shadowColor: Colors.black.withValues(alpha: 0.3),
-          shape: RoundedRectangleBorder(
-            side: const BorderSide(color: Color(0xFF334155), width: 1),
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-      ),
+      theme: lightBaseTheme,
+      darkTheme: darkBaseTheme,
       home: home ?? const SplashScreen(),
     );
   }

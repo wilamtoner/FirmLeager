@@ -7,12 +7,29 @@ import '../models/transaction.dart';
 import '../models/firm_profile.dart';
 
 class PdfInvoiceGenerator {
-  static Future<void> exportAndPrintStatement({
-    required BuildContext context,
+  static String sanitizeText(String text) {
+    final clean = text
+        .replaceAll('€', 'EUR ')
+        .replaceAll('£', 'GBP ')
+        .replaceAll('₹', 'Rs. ')
+        .replaceAll(RegExp(r'[^\x20-\x7E\r\n\t]'), ' ')
+        .trim();
+    return clean.isEmpty ? '-' : clean;
+  }
+
+  static String sanitizeCurrency(String symbol) {
+    if (symbol == '€') return 'EUR';
+    if (symbol == '£') return 'GBP';
+    if (symbol == '₹') return 'Rs.';
+    final clean = symbol.replaceAll(RegExp(r'[^\x20-\x7E]'), '').trim();
+    return clean.isEmpty ? 'Rs.' : clean;
+  }
+
+  static pw.Document buildStatementDocument({
     required List<TransactionModel> transactions,
     required FirmProfileModel firm,
     required DateTimeRange dateRange,
-  }) async {
+  }) {
     final doc = pw.Document();
 
     final dateFormat = DateFormat('yyyy-MM-dd');
@@ -39,10 +56,16 @@ class PdfInvoiceGenerator {
     }
     final netBalance = totalIncome - totalExpense;
 
-    final primaryGreen = PdfColor.fromHex('#064E3B');
-    final secondaryMint = PdfColor.fromHex('#10B981');
-    final tableHeaderBg = PdfColor.fromHex('#064E3B');
+    final primaryGreen = PdfColor.fromHex('#0A2540'); // Brand Navy Header
+    final secondaryMint = PdfColor.fromHex('#0D6EFD'); // Brand Royal Blue Accent
+    final tableHeaderBg = PdfColor.fromHex('#0A2540');
     final rowAltBg = PdfColor.fromHex('#F8FAFC');
+
+    final safeCurrency = sanitizeCurrency(firm.currencySymbol);
+    final safeFirmName = sanitizeText(firm.name).toUpperCase();
+    final safeTaxId = sanitizeText(firm.taxId);
+    final safeAddress = sanitizeText(firm.address);
+    final safePhone = sanitizeText(firm.phone);
 
     doc.addPage(
       pw.MultiPage(
@@ -58,7 +81,7 @@ class PdfInvoiceGenerator {
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
                   pw.Text(
-                    firm.name.toUpperCase(),
+                    safeFirmName.isEmpty ? 'DEMO FIRM PVT. LTD.' : safeFirmName,
                     style: pw.TextStyle(
                       fontSize: 20,
                       fontWeight: pw.FontWeight.bold,
@@ -66,9 +89,9 @@ class PdfInvoiceGenerator {
                     ),
                   ),
                   pw.SizedBox(height: 4),
-                  pw.Text('Tax ID / PAN: ${firm.taxId}', style: const pw.TextStyle(fontSize: 11)),
-                  pw.Text('Address: ${firm.address}', style: const pw.TextStyle(fontSize: 11)),
-                  pw.Text('Phone: ${firm.phone}', style: const pw.TextStyle(fontSize: 11)),
+                  pw.Text('Tax ID / PAN: $safeTaxId', style: const pw.TextStyle(fontSize: 11)),
+                  pw.Text('Address: $safeAddress', style: const pw.TextStyle(fontSize: 11)),
+                  pw.Text('Phone: $safePhone', style: const pw.TextStyle(fontSize: 11)),
                 ],
               ),
               pw.Column(
@@ -111,7 +134,7 @@ class PdfInvoiceGenerator {
                       pw.Text('Total Inflow', style: pw.TextStyle(fontSize: 10, color: primaryGreen, fontWeight: pw.FontWeight.bold)),
                       pw.SizedBox(height: 4),
                       pw.Text(
-                        '${firm.currencySymbol} ${totalIncome.toStringAsFixed(2)}',
+                        '$safeCurrency ${totalIncome.toStringAsFixed(2)}',
                         style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: primaryGreen),
                       ),
                     ],
@@ -133,7 +156,7 @@ class PdfInvoiceGenerator {
                       pw.Text('Total Outflow', style: pw.TextStyle(fontSize: 10, color: PdfColor.fromHex('#991B1B'), fontWeight: pw.FontWeight.bold)),
                       pw.SizedBox(height: 4),
                       pw.Text(
-                        '${firm.currencySymbol} ${totalExpense.toStringAsFixed(2)}',
+                        '$safeCurrency ${totalExpense.toStringAsFixed(2)}',
                         style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#991B1B')),
                       ),
                     ],
@@ -155,7 +178,7 @@ class PdfInvoiceGenerator {
                       pw.Text('Net Balance', style: pw.TextStyle(fontSize: 10, color: primaryGreen, fontWeight: pw.FontWeight.bold)),
                       pw.SizedBox(height: 4),
                       pw.Text(
-                        '${firm.currencySymbol} ${netBalance.toStringAsFixed(2)}',
+                        '$safeCurrency ${netBalance.toStringAsFixed(2)}',
                         style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: primaryGreen),
                       ),
                     ],
@@ -189,7 +212,7 @@ class PdfInvoiceGenerator {
                         _buildTableHeaderCell('Item Description'),
                         _buildTableHeaderCell('Counterparty'),
                         _buildTableHeaderCell('Method'),
-                        _buildTableHeaderCell('Amount (${firm.currencySymbol})', align: pw.TextAlign.right),
+                        _buildTableHeaderCell('Amount ($safeCurrency)', align: pw.TextAlign.right),
                       ],
                     ),
                     // Table Rows
@@ -204,8 +227,8 @@ class PdfInvoiceGenerator {
                         children: [
                           _buildTableCell(dateFormat.format(t.date)),
                           _buildTableCell(isIncome ? 'INCOME' : 'EXPENSE', color: isIncome ? primaryGreen : PdfColor.fromHex('#DC2626'), bold: true),
-                          _buildTableCell(t.title),
-                          _buildTableCell(t.partyName ?? '-'),
+                          _buildTableCell(sanitizeText(t.title)),
+                          _buildTableCell(t.partyName != null && t.partyName!.isNotEmpty ? sanitizeText(t.partyName!) : '-'),
                           _buildTableCell(t.paymentMethod.name.toUpperCase()),
                           _buildTableCell(
                             '${isIncome ? '+' : '-'}${t.amount.toStringAsFixed(2)}',
@@ -233,10 +256,10 @@ class PdfInvoiceGenerator {
                 ],
               ),
               pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.center,
                 children: [
                   pw.Container(
-                    width: 140,
+                    width: 160,
+                    height: 1,
                     decoration: const pw.BoxDecoration(
                       border: pw.Border(top: pw.BorderSide(color: PdfColors.black, width: 1)),
                     ),
@@ -249,6 +272,25 @@ class PdfInvoiceGenerator {
           )
         ],
       ),
+    );
+
+    return doc;
+  }
+
+  static Future<void> exportAndPrintStatement({
+    required BuildContext context,
+    required List<TransactionModel> transactions,
+    required FirmProfileModel firm,
+    required DateTimeRange dateRange,
+  }) async {
+    final dateFormat = DateFormat('yyyy-MM-dd');
+    final startDateStr = dateFormat.format(dateRange.start);
+    final endDateStr = dateFormat.format(dateRange.end);
+
+    final doc = buildStatementDocument(
+      transactions: transactions,
+      firm: firm,
+      dateRange: dateRange,
     );
 
     // Launch Printing / PDF Preview Dialog

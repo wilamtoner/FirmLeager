@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:printing/printing.dart';
 import '../models/transaction.dart';
 import '../models/firm_profile.dart';
 
@@ -44,5 +45,20 @@ class CsvExporter {
     final path = '${directory.path}/firm_statement_${DateTime.now().millisecondsSinceEpoch}.csv';
     final file = File(path);
     return await file.writeAsString(buffer.toString());
+  }
+
+  static Future<void> shareTransactionCsv({
+    required List<TransactionModel> transactions,
+    required FirmProfileModel firm,
+    required DateTimeRange dateRange,
+  }) async {
+    final file = await generateTransactionCsv(
+      transactions: transactions,
+      firm: firm,
+      dateRange: dateRange,
+    );
+    final bytes = await file.readAsBytes();
+    final filename = 'firm_statement_${DateFormat('yyyyMMdd').format(dateRange.start)}_${DateFormat('yyyyMMdd').format(dateRange.end)}.csv';
+    await Printing.sharePdf(bytes: bytes, filename: filename);
   }
 }

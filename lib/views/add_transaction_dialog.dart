@@ -4,6 +4,8 @@ import 'package:uuid/uuid.dart';
 import '../models/transaction.dart';
 import '../providers/transaction_provider.dart';
 import '../providers/category_provider.dart';
+import '../providers/firm_provider.dart';
+import '../theme/app_colors.dart';
 
 class AddTransactionDialog extends ConsumerStatefulWidget {
   const AddTransactionDialog({super.key});
@@ -32,13 +34,16 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
-      final amount = double.parse(_amountController.text);
+      final sanitizedText = _amountController.text.replaceAll(',', '.').trim();
+      final amount = double.tryParse(sanitizedText) ?? 0.0;
+      if (amount <= 0) return;
       final categories = ref.read(categoryProvider);
 
       String categoryId = _selectedCategoryId ??
           (_type == TransactionType.income
-              ? (categories.firstWhere((c) => c.name.contains('Income'), orElse: () => categories.first).id)
-              : categories.first.id);
+              ? (categories.where((c) => c.name.toLowerCase().contains('income')).firstOrNull?.id ??
+                  (categories.isNotEmpty ? categories.first.id : 'cat_income'))
+              : (categories.isNotEmpty ? categories.first.id : 'cat_general'));
 
       final transaction = TransactionModel(
         id: const Uuid().v4(),
@@ -58,6 +63,8 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
   @override
   Widget build(BuildContext context) {
     final categories = ref.watch(categoryProvider);
+    final firm = ref.watch(firmProvider);
+    final symbol = firm.currencySymbol;
 
     return AlertDialog(
       title: const Text('Add Transaction'),
@@ -89,10 +96,11 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
               TextFormField(
                 controller: _amountController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(labelText: 'Amount (\$)', border: OutlineInputBorder()),
+                decoration: InputDecoration(labelText: 'Amount ($symbol)', border: const OutlineInputBorder()),
                 validator: (val) {
                   if (val == null || val.trim().isEmpty) return 'Enter an amount';
-                  if (double.tryParse(val) == null) return 'Enter a valid number';
+                  final parsed = double.tryParse(val.replaceAll(',', '.').trim());
+                  if (parsed == null || parsed <= 0) return 'Enter a valid amount greater than 0';
                   return null;
                 },
               ),
@@ -118,7 +126,7 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
         TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF064E3B),
+            backgroundColor: AppColors.primaryBlue,
             foregroundColor: Colors.white,
           ),
           onPressed: _submit,

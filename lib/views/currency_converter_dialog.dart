@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/currency_provider.dart';
 import '../services/currency_service.dart';
 import '../utils/formatters.dart';
+import '../theme/app_colors.dart';
 
 class CurrencyConverterDialog extends ConsumerStatefulWidget {
   const CurrencyConverterDialog({super.key});
@@ -45,14 +46,15 @@ class _CurrencyConverterDialogState extends ConsumerState<CurrencyConverterDialo
         constraints: const BoxConstraints(maxWidth: 480),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
               // Header
               Row(
                 children: [
-                  const Icon(Icons.currency_exchange, size: 20, color: Color(0xFF064E3B)),
+                  const Icon(Icons.currency_exchange, size: 20, color: AppColors.primaryBlue),
                   const SizedBox(width: 8),
                   const Expanded(
                     child: Text(
@@ -130,7 +132,7 @@ class _CurrencyConverterDialogState extends ConsumerState<CurrencyConverterDialo
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 onChanged: (val) {
-                  final parsed = double.tryParse(val) ?? 0.0;
+                  final parsed = double.tryParse(val.replaceAll(',', '.').trim()) ?? 0.0;
                   notifier.setAmount(parsed);
                 },
               ),
@@ -166,7 +168,7 @@ class _CurrencyConverterDialogState extends ConsumerState<CurrencyConverterDialo
                   ),
                   IconButton(
                     onPressed: () => notifier.swap(),
-                    icon: const Icon(Icons.swap_horiz, size: 28, color: Color(0xFF064E3B)),
+                    icon: const Icon(Icons.swap_horiz, size: 28, color: AppColors.primaryBlue),
                     tooltip: 'Swap Currencies',
                   ),
                   Expanded(
@@ -198,12 +200,13 @@ class _CurrencyConverterDialogState extends ConsumerState<CurrencyConverterDialo
               ),
               const SizedBox(height: 20),
 
-              // Converted Result Display Card
+              // 3. Prominent Result Card
               Container(
-                padding: const EdgeInsets.all(16),
+                width: double.infinity,
+                padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFF064E3B), Color(0xFF047857)],
+                    colors: [AppColors.primaryDark, Color(0xFF1E40AF)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -299,7 +302,7 @@ class _CurrencyConverterDialogState extends ConsumerState<CurrencyConverterDialo
                   Expanded(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF064E3B),
+                        backgroundColor: AppColors.primaryBlue,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -314,6 +317,7 @@ class _CurrencyConverterDialogState extends ConsumerState<CurrencyConverterDialo
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

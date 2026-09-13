@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import '../models/debt.dart';
 import '../providers/debt_provider.dart';
 import '../providers/firm_provider.dart';
+import '../theme/app_colors.dart';
 
 class AddDebtDialog extends ConsumerStatefulWidget {
   const AddDebtDialog({super.key});
@@ -35,9 +36,15 @@ class _AddDebtDialogState extends ConsumerState<AddDebtDialog> {
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
-      final amount = double.parse(_amountController.text);
-      final apr = _noInterest ? 0.0 : (double.tryParse(_aprController.text) ?? 0.0);
-      final minPayment = _noMonthlyPayment ? 0.0 : (double.tryParse(_minPaymentController.text) ?? 0.0);
+      final sanitizedAmount = _amountController.text.replaceAll(',', '.').trim();
+      final amount = double.tryParse(sanitizedAmount) ?? 0.0;
+      if (amount <= 0) return;
+      final apr = _noInterest
+          ? 0.0
+          : (double.tryParse(_aprController.text.replaceAll(',', '.').trim()) ?? 0.0);
+      final minPayment = _noMonthlyPayment
+          ? 0.0
+          : (double.tryParse(_minPaymentController.text.replaceAll(',', '.').trim()) ?? 0.0);
 
       final debt = DebtModel(
         id: const Uuid().v4(),
@@ -110,7 +117,8 @@ class _AddDebtDialogState extends ConsumerState<AddDebtDialog> {
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 decoration: InputDecoration(labelText: 'Initial Balance ($symbol)', border: const OutlineInputBorder()),
                 validator: (val) {
-                  final p = val == null ? null : double.tryParse(val);
+                  if (val == null || val.trim().isEmpty) return 'Enter balance';
+                  final p = double.tryParse(val.replaceAll(',', '.').trim());
                   return p == null || p <= 0 ? 'Enter balance greater than 0' : null;
                 },
               ),
@@ -124,7 +132,7 @@ class _AddDebtDialogState extends ConsumerState<AddDebtDialog> {
                 title: const Text('No Interest (0% APR)', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                 subtitle: const Text('Interest-free loan without any finance charges', style: TextStyle(fontSize: 12)),
                 value: _noInterest,
-                activeThumbColor: const Color(0xFF064E3B),
+                activeThumbColor: AppColors.primaryBlue,
                 onChanged: (val) {
                   setState(() {
                     _noInterest = val;
@@ -167,7 +175,8 @@ class _AddDebtDialogState extends ConsumerState<AddDebtDialog> {
                     decoration: const InputDecoration(labelText: 'Interest Rate (APR %)', border: OutlineInputBorder()),
                     validator: (val) {
                       if (_noInterest) return null;
-                      final p = val == null ? null : double.tryParse(val);
+                      if (val == null || val.trim().isEmpty) return 'Enter valid APR (0 or higher)';
+                      final p = double.tryParse(val.replaceAll(',', '.').trim());
                       return p == null || p < 0 ? 'Enter valid APR (0 or higher)' : null;
                     },
                   ),
@@ -179,7 +188,7 @@ class _AddDebtDialogState extends ConsumerState<AddDebtDialog> {
                 title: const Text('No Monthly Payment', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                 subtitle: const Text('Flexible payoff — pay anytime or lump-sum', style: TextStyle(fontSize: 12)),
                 value: _noMonthlyPayment,
-                activeThumbColor: const Color(0xFF064E3B),
+                activeThumbColor: AppColors.primaryBlue,
                 onChanged: (val) {
                   setState(() {
                     _noMonthlyPayment = val;
@@ -222,7 +231,8 @@ class _AddDebtDialogState extends ConsumerState<AddDebtDialog> {
                     decoration: InputDecoration(labelText: 'Min Monthly Payment ($symbol)', border: const OutlineInputBorder()),
                     validator: (val) {
                       if (_noMonthlyPayment) return null;
-                      final p = val == null ? null : double.tryParse(val);
+                      if (val == null || val.trim().isEmpty) return 'Enter min payment (0 or higher)';
+                      final p = double.tryParse(val.replaceAll(',', '.').trim());
                       return p == null || p < 0 ? 'Enter min payment (0 or higher)' : null;
                     },
                   ),
@@ -235,7 +245,7 @@ class _AddDebtDialogState extends ConsumerState<AddDebtDialog> {
         TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF064E3B),
+            backgroundColor: AppColors.primaryBlue,
             foregroundColor: Colors.white,
           ),
           onPressed: _submit,

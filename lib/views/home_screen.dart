@@ -1,19 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dashboard_tab.dart';
+import 'date_converter_screen.dart';
 import 'expense_tab.dart';
 import 'debt_tab.dart';
-import 'debt_payoff_screen.dart';
 import 'edit_firm_dialog.dart';
+import 'gold_silver_screen.dart';
 import '../providers/transaction_provider.dart';
+import '../providers/debt_provider.dart';
+import '../providers/category_provider.dart';
 import '../providers/firm_provider.dart';
+import '../providers/recurring_provider.dart';
 import '../providers/theme_provider.dart';
 import '../utils/csv_exporter.dart';
 import '../utils/pdf_invoice_generator.dart';
 import '../utils/backup_service.dart';
+import '../theme/app_colors.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
+
+  static const Color brandPrimary = AppColors.primaryDark;
+  // Keep darkGreen as alias for backward compatibility
+  static const Color darkGreen = brandPrimary;
 
   @override
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
@@ -26,10 +35,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     DashboardTab(),
     ExpenseTab(),
     DebtTab(),
-    DebtPayoffScreen(),
   ];
 
-  static const Color darkGreen = Color(0xFF064E3B);
+  static const Color darkGreen = HomeScreen.brandPrimary;
+
+  @override
+  void initState() {
+    super.initState();
+    // Automatically process any pending recurring transactions upon app launch
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(recurringProvider.notifier).checkAndProcessDue();
+    });
+  }
 
   Future<void> _exportCsv() async {
     final transactions = ref.read(transactionProvider);
@@ -39,19 +56,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       end: DateTime.now(),
     );
 
-    final file = await CsvExporter.generateTransactionCsv(
-      transactions: transactions,
-      firm: firm,
-      dateRange: dateRange,
-    );
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('CSV Statement Exported: ${file.path}'),
-          duration: const Duration(seconds: 4),
-        ),
+    try {
+      await CsvExporter.shareTransactionCsv(
+        transactions: transactions,
+        firm: firm,
+        dateRange: dateRange,
       );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Export failed: $e')),
+        );
+      }
     }
   }
 
@@ -63,25 +79,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       end: DateTime.now(),
     );
 
-    await PdfInvoiceGenerator.exportAndPrintStatement(
-      context: context,
-      transactions: transactions,
-      firm: firm,
-      dateRange: dateRange,
-    );
+    try {
+      await PdfInvoiceGenerator.exportAndPrintStatement(
+        context: context,
+        transactions: transactions,
+        firm: firm,
+        dateRange: dateRange,
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('PDF export failed: $e')),
+        );
+      }
+    }
   }
 
   Future<void> _backupData() async {
     try {
-      final file = await BackupService.createBackupFile();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Full Backup Saved: ${file.path}'),
-            duration: const Duration(seconds: 4),
-          ),
-        );
-      }
+      await BackupService.shareBackupFile();
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -89,6 +105,74 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         );
       }
     }
+  }
+
+  void _restoreData() {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Restore from Backup (JSON)'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Paste your FirmLedger backup JSON below to restore categories, transactions, and debt records.',
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller,
+                maxLines: 6,
+                decoration: const InputDecoration(
+                  hintText: '{"appName": "FirmLedger", ...}',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: darkGreen,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () async {
+              final text = controller.text.trim();
+              if (text.isEmpty) return;
+              try {
+                final results = await BackupService.restoreFromJson(text);
+                if (ctx.mounted) {
+                  Navigator.of(ctx).pop();
+                }
+                if (mounted) {
+                  ref.read(transactionProvider.notifier).loadTransactions();
+                  ref.read(debtProvider.notifier).loadDebts();
+                  ref.read(categoryProvider.notifier).loadCategories();
+                  ref.read(recurringProvider.notifier).loadRecurring();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Restored ${results['transactions']} transactions, ${results['debts']} debts, ${results['categories']} categories.'),
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Restore failed: $e')),
+                  );
+                }
+              }
+            },
+            child: const Text('Restore Data'),
+          ),
+        ],
+      ),
+    ).then((_) => controller.dispose());
   }
 
   @override
@@ -101,11 +185,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         title: Row(
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(8),
               child: Image.asset(
                 'assets/images/app_logo.png',
-                width: 28,
-                height: 28,
+                width: 32,
+                height: 32,
                 fit: BoxFit.cover,
                 errorBuilder: (ctx, _, __) => const Icon(Icons.account_balance_wallet, size: 24),
               ),
@@ -146,6 +230,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               tooltip: 'Backup Database (JSON)',
               onPressed: _backupData,
             ),
+            IconButton(
+              icon: const Icon(Icons.settings_backup_restore, color: Colors.white),
+              tooltip: 'Restore Database (JSON)',
+              onPressed: _restoreData,
+            ),
             Padding(
               padding: const EdgeInsets.only(right: 12.0),
               child: Center(
@@ -184,6 +273,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   case 'backup':
                     _backupData();
                     break;
+                  case 'restore':
+                    _restoreData();
+                    break;
+                  case 'date_converter':
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (ctx) => const DateConverterScreen()),
+                    );
+                    break;
+                  case 'gold_silver':
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (ctx) => const GoldSilverScreen()),
+                    );
+                    break;
                 }
               },
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -191,6 +293,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 PopupMenuItem(
                   value: 'edit',
                   child: Text('Edit Firm Info'),
+                ),
+                PopupMenuItem(
+                  value: 'gold_silver',
+                  child: Text('Gold & Silver Rates (NP)'),
+                ),
+                PopupMenuItem(
+                  value: 'date_converter',
+                  child: Text('Nepali Date Converter'),
                 ),
                 PopupMenuItem(
                   value: 'pdf',
@@ -203,6 +313,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 PopupMenuItem(
                   value: 'backup',
                   child: Text('Backup Database'),
+                ),
+                PopupMenuItem(
+                  value: 'restore',
+                  child: Text('Restore from Backup'),
                 ),
               ],
             ),
@@ -220,7 +334,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           NavigationDestination(icon: Icon(Icons.dashboard_outlined), selectedIcon: Icon(Icons.dashboard), label: 'Dashboard'),
           NavigationDestination(icon: Icon(Icons.receipt_long_outlined), selectedIcon: Icon(Icons.receipt_long), label: 'Expenses'),
           NavigationDestination(icon: Icon(Icons.account_balance_wallet_outlined), selectedIcon: Icon(Icons.account_balance_wallet), label: 'Ledger'),
-          NavigationDestination(icon: Icon(Icons.calculate_outlined), selectedIcon: Icon(Icons.calculate), label: 'Strategy'),
         ],
       ),
     );

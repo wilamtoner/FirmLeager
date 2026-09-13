@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-09-13T10:40:21.044102Z",
+  "skills_count": 2,
+  "total_files": 23,
+  "skills": {
+    "flutter-sdk-changelog": {
+      "name": "flutter-sdk-changelog",
+      "path": ".agents/skills/flutter-sdk-changelog",
+      "description": "Expert guide and lookup reference for Flutter framework versions, widget deprecations, API replacements, Material 3 migrations, and the unbundling of standalone material_ui and cupertino_ui packages from Flutter 1.0 to modern Flutter (3.44+ / 3.47+). Use this skill whenever the user asks \"what's new in Flutter X\", \"what's new in 3.47\", \"what's new in 3.44\", \"what's new in 3.24\", \"what's new in 3.22\", asks how to fix deprecated Flutter widgets (WillPopScope, withOpacity, MaterialState, FlatButton, accentColor), requests migration to the split or unbundled design packages (\"migrate to split packages\", \"material_ui\", \"cupertino_ui\"), needs assistance migrating to Material 3, or requires help rescuing legacy Flutter applications.",
+      "file_count": 6,
+      "composite_hash": "015705d2a52a2b0178741bfcddb743ad998357446ddfe4a447574af889615863",
+      "files": {
+        "SKILL.md": "fa5f7a6bb2bc18937a39e6c58063256a32a73329355352a12d35402b13d5e01f",
+        "references/flutter-to-dart-version-matrix.md": "1eb5212341dde917f93720ad266b2b5798a2e86e64a4293629fe2854b1edfe64",
+        "references/material-2-to-material-3-guide.md": "90c4131dbf2ecf6729e4979279fb433e8ec5706d64fc167219138f588cf852d0",
+        "references/material-ui-and-cupertino-ui-migration.md": "74880b6a3ac1924f491def439c4647a43325a1baa6e7e7394a18941f6ebdda8f",
+        "references/rescuing-legacy-flutter-apps.md": "3b92e3df9b5b827e85f146cc4043348bc7b81b63345707f21b3cd349503bbfb8",
+        "references/widget-deprecations-and-replacements.md": "222e135fbc5ca3676ce55729a2492630d7961dc52b1a2ee60f9d7f33c003c3b7"
+      }
+    },
+    "dart-sdk-changelog": {
+      "name": "dart-sdk-changelog",
+      "path": ".agents/skills/dart-sdk-changelog",
+      "description": "Expert guide and lookup reference for the Dart SDK CHANGELOG, version history, experimental features, macros, and augmentations from Dart 1.x to modern Dart 3.x. Use this skill whenever the user asks \"what's new in Dart X\", \"what's new in 3.13\", \"what's new in 3.12\", asks how to find the minimum SDK version (minSdk) for any language feature or core API, needs guidance on experimental feature flags (--enable-experiment), macros, and augmentations (augment, augmented(), import augment), or requires assistance rescuing and modernizing legacy Dart 1.x / pre-2.12 codebases to modern Dart 3.x.",
+      "file_count": 17,
+      "composite_hash": "cc0dc9ff3a6f5563475ecc6b69ea26b94b9c374ef820be0cd01c2ef536a16de1",
+      "files": {
+        "SKILL.md": "b537b693699370ee853d68ab1b68af54c4e604c9b32249cf17d2721a60cc73b5",
+        "references/dart-2-milestones.md": "5601c8a2d94462b1002c7a71f21f76e0260de2dc770fa79274afd0678fca735d",
+        "references/experimental-features-guide.md": "fc6a19309d918a252e8781409118a86998d8a43f9f850d5c92358abb5ff3c224",
+        "references/how-to-find-minsdk.md": "b9b0af176428b163114bb8d57c84ab9e3ef378e67b6accf3c925fae189eeadb6",
+        "references/macros-and-augmentations-guide.md": "4209990f45fe63d8566e4528c94aa264a9c965984f6893cc8d8dc9dda1e9769a",
+        "references/rescuing-legacy-dart-apps.md": "bd1cea58bc012becf9b38f46a8fa728f3952c3b91f11e4d391306e918934e7fa",
+        "references/version-matrix.md": "bf3fa525ef64ff1ca4e27c5f4fad8356ec16d292741bd174f846dfc0d657062b",
+        "references/whats-new-in-dart-3-0-to-3-5.md": "f85216ce7e57488d87af850370f748d3902309e2a28087e9658e0fed21f2b664",
+        "references/whats-new-in-dart-3-10.md": "8c1688b8d25e0a04616219d0051e342e06ebba7a39d244849422ec74a70e9f3f",
+        "references/whats-new-in-dart-3-11.md": "aac8961770c71995a4e89f5e01f7f36fbf2ce24fae5c302e8ccc444f7527cd0e",
+        "references/whats-new-in-dart-3-12.md": "f5c84986ad27606b44855ae3f387299c133731faf965ecb98a539163fa593a31",
+        "references/whats-new-in-dart-3-13.md": "dc055e3b65d5da0ad631bada266c33a860fdb9a7f5304f5ab5c95247ce46e70e",
+        "references/whats-new-in-dart-3-14.md": "6937c544f86239e1d8daf9a5c0bd50a694b07e31dce639477cf6df7952ba361b",
+        "references/whats-new-in-dart-3-6.md": "f351d3da4f5ce5453ae800d745ae8eea0a578c0b906bf562e2f9e6ca46ec9c28",
+        "references/whats-new-in-dart-3-7.md": "8b192154e9f30cf490a50b0a4b3419ff1ae2efa0e4358e521b9bb43112438aa5",
+        "references/whats-new-in-dart-3-8.md": "5a9d4b32ac692763591bd13ea2f3c5df8e01d4f66bfc088f4ffe636992a4aa83",
+        "references/whats-new-in-dart-3-9.md": "b7c678f6c9a21ef2f7cb543c29cd1735986124829d760670b8ef0ba9a602e386"
+      }
+    }
+  }
+}

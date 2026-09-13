@@ -43,7 +43,9 @@ class DebtModel {
       id: map['id'] as String,
       title: map['title'] as String,
       partyName: map['partyName'] as String,
-      isOwedByMe: (map['isOwedByMe'] as int) == 1,
+      isOwedByMe: map['isOwedByMe'] is bool
+          ? (map['isOwedByMe'] as bool)
+          : (map['isOwedByMe'] == 1),
       originalAmount: (map['originalAmount'] as num).toDouble(),
       currentBalance: (map['currentBalance'] as num).toDouble(),
       apr: (map['apr'] as num).toDouble(),
@@ -54,19 +56,28 @@ class DebtModel {
   }
 
   DebtModel copyWith({
+    String? id,
+    String? title,
+    String? partyName,
+    bool? isOwedByMe,
+    double? originalAmount,
     double? currentBalance,
+    double? apr,
+    double? minMonthlyPayment,
+    DateTime? dueDate,
+    String? notes,
   }) {
     return DebtModel(
-      id: id,
-      title: title,
-      partyName: partyName,
-      isOwedByMe: isOwedByMe,
-      originalAmount: originalAmount,
+      id: id ?? this.id,
+      title: title ?? this.title,
+      partyName: partyName ?? this.partyName,
+      isOwedByMe: isOwedByMe ?? this.isOwedByMe,
+      originalAmount: originalAmount ?? this.originalAmount,
       currentBalance: currentBalance ?? this.currentBalance,
-      apr: apr,
-      minMonthlyPayment: minMonthlyPayment,
-      dueDate: dueDate,
-      notes: notes,
+      apr: apr ?? this.apr,
+      minMonthlyPayment: minMonthlyPayment ?? this.minMonthlyPayment,
+      dueDate: dueDate ?? this.dueDate,
+      notes: notes ?? this.notes,
     );
   }
 }

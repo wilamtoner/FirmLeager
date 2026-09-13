@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:printing/printing.dart';
 import '../services/database_service.dart';
 import '../models/category.dart';
 import '../models/transaction.dart';
@@ -36,7 +37,8 @@ class BackupService {
   static Future<Map<String, int>> restoreFromJson(String jsonContent) async {
     final Map<String, dynamic> data = jsonDecode(jsonContent);
 
-    if (data['appName'] != 'FirmLedger') {
+    final appName = (data['appName'] ?? '').toString().toLowerCase();
+    if (appName != 'firmledger' && appName != 'expensedebtmanager') {
       throw const FormatException('Invalid backup file. Not a FirmLedger backup.');
     }
 
@@ -87,5 +89,12 @@ class BackupService {
       'debts': debtsCount,
       'recurring': recurringCount,
     };
+  }
+
+  static Future<void> shareBackupFile() async {
+    final file = await createBackupFile();
+    final bytes = await file.readAsBytes();
+    final filename = 'firmledger_backup_${DateTime.now().millisecondsSinceEpoch}.json';
+    await Printing.sharePdf(bytes: bytes, filename: filename);
   }
 }

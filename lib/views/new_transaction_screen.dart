@@ -8,13 +8,16 @@ import '../models/category.dart';
 import '../providers/transaction_provider.dart';
 import '../providers/debt_provider.dart';
 import '../providers/category_provider.dart';
+import '../theme/app_colors.dart';
 
 class NewTransactionScreen extends ConsumerStatefulWidget {
   final TransactionType initialType;
+  final PaymentMethod? initialMethod;
 
   const NewTransactionScreen({
     super.key,
     this.initialType = TransactionType.income,
+    this.initialMethod,
   });
 
   @override
@@ -26,7 +29,7 @@ class _NewTransactionScreenState extends ConsumerState<NewTransactionScreen> {
 
   late TransactionType _transactionType;
   IncomeType _incomeType = IncomeType.goods;
-  PaymentMethod _paymentMethod = PaymentMethod.cash;
+  late PaymentMethod _paymentMethod;
   String? _selectedCategoryId;
 
   final _titleController = TextEditingController();
@@ -34,12 +37,15 @@ class _NewTransactionScreenState extends ConsumerState<NewTransactionScreen> {
   final _amountController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
 
-  static const Color darkGreen = Color(0xFF064E3B);
+  static const Color brandDark = AppColors.primaryDark;
+  static const Color brandBlue = AppColors.primaryBlue;
+  static const Color darkGreen = brandBlue;
 
   @override
   void initState() {
     super.initState();
     _transactionType = widget.initialType;
+    _paymentMethod = widget.initialMethod ?? PaymentMethod.cash;
   }
 
   @override
@@ -58,7 +64,7 @@ class _NewTransactionScreenState extends ConsumerState<NewTransactionScreen> {
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
     );
-    if (picked != null) {
+    if (picked != null && mounted) {
       setState(() => _selectedDate = picked);
     }
   }
@@ -66,7 +72,9 @@ class _NewTransactionScreenState extends ConsumerState<NewTransactionScreen> {
   void _submit() {
     FocusManager.instance.primaryFocus?.unfocus();
     if (_formKey.currentState!.validate()) {
-      final amount = double.parse(_amountController.text);
+      final sanitizedText = _amountController.text.replaceAll(',', '.').trim();
+      final amount = double.tryParse(sanitizedText) ?? 0.0;
+      if (amount <= 0) return;
       final categories = ref.read(categoryProvider);
       final partyName = _partyController.text.trim();
 
@@ -149,7 +157,7 @@ class _NewTransactionScreenState extends ConsumerState<NewTransactionScreen> {
             ],
           ),
         );
-        if (shouldPop == true) {
+        if (shouldPop == true && context.mounted) {
           navigator.pop(result);
         }
       },
@@ -162,7 +170,7 @@ class _NewTransactionScreenState extends ConsumerState<NewTransactionScreen> {
             isIncome ? 'New Income Entry' : 'New Expense Entry',
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
-          backgroundColor: darkGreen,
+          backgroundColor: brandDark,
           foregroundColor: Colors.white,
           elevation: 0,
         ),
@@ -346,7 +354,7 @@ class _NewTransactionScreenState extends ConsumerState<NewTransactionScreen> {
                   ),
                   validator: (val) {
                     if (val == null || val.trim().isEmpty) return 'Enter amount';
-                    final parsed = double.tryParse(val);
+                    final parsed = double.tryParse(val.replaceAll(',', '.').trim());
                     if (parsed == null || parsed <= 0) return 'Enter a valid amount greater than 0';
                     return null;
                   },
